@@ -1,4 +1,12 @@
-
+        button{
+            width: 120px;
+        }
+        input{
+            width: 120px;
+        }
+        text{
+            width: 120px;
+        }
         .panel,
         #dtmf_keypad {
             display: none;
@@ -65,8 +73,6 @@
         }
 
         #keypad_table tr td {
-            vertical-align: middle;
-            text-align: center;
             border: 1px solid #000000;
             font-size: 18px;
             font-weight: bold;
@@ -85,19 +91,16 @@
         #hangup_btn,
         #cancel_outgoing_call_btn,
         #reject_btn {
-            background-color: lightpink;
             border-color: lightpink;
         }
 
         #accept_audio_btn,
         #accept_recvonly_video_btn,
         #accept_video_btn {
-            background-color: lightgreen;
             border-color: lightgreen;
         }
 
         #redirect_btn {
-            background-color: lightskyblue;
             border-color: lightskyblue;
         }
 
