@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Demo WEBRTC</title>
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="./files/phone.css">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="./files/images/favicon.png">
+	
+    <script defer="" src="./files/ac_webrtc.min.js"></script>
+    <script defer="" src="./files/utils.js"></script>
+    <script defer="" src="./files/tracer.js"></script>
+    <script defer="" src="./files/config.js"></script>
+    <script defer="" src="./files/phone.js"></script>
+</head>
+
+<body onload="documentIsReady()">
+    <!-- Check that browser is not IE -->
+    <script>
+        var ua = window.navigator.userAgent;
+        if (ua.indexOf('MSIE ') > 0 || ua.indexOf('Trident/') > 0) {
+            alert("Internet Explorer is not supported. Please use Chrome or Firefox");
+        }
+    </script>
+
+    <!--
+        HTML components of simple GUI
+    -->
+    <div id="status_line" class="bg-info text-white text-center py-2">Please set user, display-name and password, and optional authorization name.</div>
+
+    <!-- All panels are hidden, except one  -->
+    <div id="panels" class="container mt-3">
+        <div id="setting_panel" class="panel" style="display: block;">
+            <form id="setting" class="bg-light p-3 rounded" onsubmit="event.preventDefault()">
+                <fieldset>
+                    <legend>Server</legend>
+                    <input class="form-control" type="text" name="sip_domain" size="30" placeholder="SIP domain name" autocomplete="server domain" title="SIP domain name" required="">
+                    <input class="form-control" type="text" name="sip_addresses" size="30" placeholder="SIP server addresses" autocomplete="server address" title="SIP server addresses" required="">
+                    <input class="form-control" type="text" name="ice_servers" size="30" placeholder="optional STUN/TURN servers" autocomplete="server ices" title="Optional STUN/TURN servers.">
+                </fieldset>
+
+                <fieldset>
+                    <legend>Account</legend>
+                    <input class="form-control" type="text" name="user" size="30" placeholder="user name" title="User name" autocomplete="account name" required="">
+                    <input class="form-control" type="text" name="display_name" size="30" placeholder="display name" title="Optional display name" autocomplete="account display-name">
+                    <input class="form-control" type="password" name="password" size="30" placeholder="password" title="User password" autocomplete="account password" required="">
+                    <input class="form-control" type="text" name="auth_user" size="30" placeholder="optional authorization name" title="Optional authorization name" autocomplete="account auth-name">
+                </fieldset>
+
+            </form>
+            <button id="login_btn" class="btn btn-primary" title="Login">Login</button>
+        </div>
+
+        <div id="devices_panel" class="panel" style="display: block;">
+            
+                <form id="devices" class="bg-light p-3 rounded" onsubmit="event.preventDefault()">
+                    <div class="form-group">
+                        <fieldset>
+                            <legend>Devices</legend>
+                            <dev id="microphone_dev" style="display: block;">
+                            Microphone<br>
+                            <select name="microphone" class="form-control" ></select>
+                            
+                            <br>
+                            </dev>
+                            <dev id="speaker_dev" style="display: block;">
+                            Speaker<br>
+                            <select name="speaker" class="form-control" ></select>
+                            
+                            <br>
+                            </dev>
+                            <dev id="camera_dev" style="display: block;">
+                            Camera<br>
+                            <select name="camera" class="form-control" ></select>
+                            
+                            <br>
+                            </dev>
+                            <dev id="ringer_dev" style="display: block;">
+                            Secondary ringer<br>
+                            <select name="ringer" class="form-control" ></select>
+                            </dev>
+                        </fieldset>
+                    </div>
+                    <div class="form-check">   
+                        <input type="checkbox" class="form-check-input" title="Constraint deviceId: {exact: &#39;xxx&#39;}" id="devices_exact_ckb">Exact</input>
+                        <br>                        
+                    </div>
+                    <input id="devices_done_btn" class="btn btn-primary" type="button" value="Done">
+                </form>
+        </div>
+
+        <div id="dialer_panel" class="panel" style="display: none;">
+            <div class="d-flex justify-content-between mb-3">
+                <button id="settings_btn" class="btn btn-secondary" title="Settings">Settings</button>
+                <button id="devices_btn" class="btn btn-secondary" title="Select microphone, speaker, camera">Devices</button>
+                <button id="call_log_btn" class="btn btn-secondary" title="Call log">Call log</button>
+                <button id="redial_last_call_btn" class="btn btn-secondary" title="Redial last call">Redial</button>
+                <button id="message_btn" class="btn btn-secondary" title="View/Send Messages">Messages</button>
+                <button id="subscribe_btn" class="btn btn-secondary" title="Subscribe/Notify dialog test">Subscribe</button>
+                <button id="enable_sound_btn" class="btn btn-secondary" title="Press to enable sound">Enable sound</button>
+                <button id="notification_permission_btn" class="btn btn-secondary" title="Press to set notification permission">Enable incoming call Notification</button>
+            <br>
+             </div>
+
+            <fieldset>
+                
+                <form id="call_form" class="form-inline" onsubmit="event.preventDefault()">                    
+                    <input type="text" class="form-control mr-2" name="call_to" placeholder="Phone Number">                
+                    <input id="audio_call_btn" class="btn btn-primary mr-2" type="button" value="Audio">
+                    <input id="video_call_btn" class="btn btn-primary" type="button" value="Video">                
+                </form>
+            </fieldset>
+        </div>
+
+        <div id="call_log_panel" class="panel" style="display: none;">
+            <div class="d-flex justify-content-between mb-3">
+                <button id="call_log_return_btn" class="btn btn-secondary" title="returns to dialer">Dialer</button>
+                <button id="call_log_clear_btn" class="btn btn-danger" title="Clear call log">Clear log</button>
+            </div>
+
+            <fieldset>
+                <legend>Call Logs:</legend>
+                <ul id="call_log_ul" class="list-group">
+                </ul>
+            </fieldset>
+        </div>
+
+        <div id="outgoing_call_panel" class="panel" style="display: none;">
+            <fieldset>
+                <legend>calling</legend>
+                <p id="outgoing_call_user"></p>
+                <p id="outgoing_call_progress"></p>
+                <br>
+                <input id="cancel_outgoing_call_btn" type="button" value="Cancel">
+            </fieldset>
+        </div>
+
+        <div id="incoming_call_panel" class="panel" style="display: none;">
+            <fieldset>
+                <legend>incoming call</legend>
+                <p id="incoming_call_user"></p>
+                <br>
+                <input id="accept_audio_btn" type="button" value="Accept audio">
+                <input id="accept_recvonly_video_btn" type="button" value="Accept receive video">
+                <input id="accept_video_btn" type="button" value="Accept video">
+                <input id="reject_btn" type="button" value="Reject">
+                <input id="redirect_btn" type="button" value="Redirect"><br>
+            </fieldset>
+        </div>
+
+        <div id="redirect_call_panel" class="panel" style="display: none;">
+            <fieldset>
+                <legend>redirect call</legend>
+                <form id="redirect_form" onsubmit="event.preventDefault()">
+                    <input type="text" class="input" name="redirect_to">
+                    <input id="do_redirect_btn" type="button" value="Done">
+                </form>
+            </fieldset>
+        </div>
+
+        <div id="transfer_call_panel" class="panel" style="display: none;">
+            <fieldset>
+                <legend>blind call transfer</legend>
+                <form id="transfer_form" onsubmit="event.preventDefault()">
+                    <input type="text" class="input" name="transfer_to">
+                    <input id="do_transfer_btn" type="button" value="Done">
+                </form>
+            </fieldset>
+        </div>
+
+        <div id="call_established_panel" class="panel" style="display: none;">
+            <div>
+                <fieldset>
+                    <legend>open call</legend>
+                    <p id="call_established_user"></p>
+                    <br>
+                    <input id="hangup_btn" type="button" value="Hangup" title="Terminate the call">
+                    <br>
+                    <input id="mute_audio_btn" type="button" value="Mute" title="Mute/Unmute microphone">
+                    <input id="info_btn" type="button" value="Info" title="Print to console call information [for debugging]">
+                    <input id="stats_btn" type="button" value="Stats" title="Print to console call statistics [for debugging]">
+                    <input id="codecs_btn" type="button" value="Codecs" title="Print to console selected codecs [for debugging]">
+                    <input id="send_reinvite_btn" type="button" value="Send re-INVITE" title="Send SIP re-INVITE message [for debugging]">
+                    <input id="send_info_btn" type="button" value="Send INFO" title="Send SIP INFO">
+                    <input id="blind_transfer_btn" type="button" value="transfer" title="Call blind transfer - asks the other side to call someone">
+                    <input id="send_video_btn" type="button" value="Start sending video" title="Start/stop sending video">
+                    <input id="screen_sharing_btn" type="button" value="Start screen sharing" title="Start/stop screen sharing">
+                    <input id="enable_receive_video_btn" type="button" value="Enable receive video" title="Enable/Disable receive video">
+                    <span id="video_controls_span">
+                        <input id="mute_video_btn" type="button" value="Mute video" title="Mute/unmute web camera">
+                        <span>Hide local video</span><input type="checkbox" id="hide_local_video_ckb">
+                        <span>Video size</span>
+                        <select id="video_size_select">
+                            <option value="Default">Default</option>
+                            <option value="Micro">Micro</option>
+                            <option value="X Tiny">X Tiny</option>
+                            <option value="Tiny">Tiny</option>
+                            <option value="X Small">X Small</option>
+                            <option value="Small">Small</option>
+                            <option value="Medium">Medium</option>
+                            <option value="X Medium">X Medium</option>
+                            <option value="Large">Large</option>
+                            <option value="X Large">X Large</option>
+                            <option value="XX Large">XX Large</option>
+                            <option value="Huge">Huge</option>
+                            <option value="Custom">Custom</option>
+                            <option value="Reset Custom">Reset Custom</option>
+                        </select>
+                    </span>
+                    <input id="hold_btn" type="button" value="Hold" title="Hold/Unhold the call">
+                    <br>
+                    <input id="keypad_btn" type="button" value="Keypad" title="Open/Close key panel">
+                </fieldset>
+            </div>
+            <div id="dtmf_keypad">
+                <table id="keypad_table" cellpadding="5" cellspacing="3">
+                    <tbody><tr>
+                        <td onclick="guiSendDTMF('1')">1</td>
+                        <td onclick="guiSendDTMF('2')">2</td>
+                        <td onclick="guiSendDTMF('3')">3</td>
+                    </tr>
+                    <tr>
+                        <td onclick="guiSendDTMF('4')">4</td>
+                        <td onclick="guiSendDTMF('5')">5</td>
+                        <td onclick="guiSendDTMF('6')">6</td>
+                    </tr>
+                    <tr>
+                        <td onclick="guiSendDTMF('7')">7</td>
+                        <td onclick="guiSendDTMF('8')">8</td>
+                        <td onclick="guiSendDTMF('9')">9</td>
+                    </tr>
+                    <tr>
+                        <td onclick="guiSendDTMF('*')">*</td>
+                        <td onclick="guiSendDTMF('0')">0</td>
+                        <td onclick="guiSendDTMF('#')">#</td>
+                    </tr>
+                    <!-- Note: A B C D can be used, e.g. guiSendDTMF('A') -->
+                </tbody></table>
+            </div>
+        </div>
+
+        <div id="message_panel" class="panel" style="display: none;">
+            <button id="message_return_btn" title="returns to dialer">Dialer</button>
+            <fieldset>
+                <legend>send message</legend>
+                <form id="send_message_form" onsubmit="event.preventDefault()">
+                    to:<input type="text" class="input" name="send_to">
+                    <br>
+                    <textarea rows="3" cols="30" name="message"></textarea>
+                    <br>
+                    <input id="send_message_btn" type="button" value="Send">
+                </form>
+            </fieldset>
+
+            <fieldset>
+                <legend>messages</legend>
+                <button id="message_clear_btn" title="clear all messages">Clear</button>
+                <ul id="message_ul">
+                </ul>
+            </fieldset>
+        </div>
+
+        <div id="subscribe_panel" class="panel" style="display: none;">
+            <button id="subscribe_return_btn" title="returns to dialer">Dialer</button>
+            <fieldset>
+                <legend>settings</legend>
+                <form id="subscribe_test_setting_form" onsubmit="event.preventDefault()">
+                    to user:<input type="text" class="input" name="user" size="6">
+                    event:<input type="text" class="input" name="event_name" size="6" value="test"><br>
+                    accept:<input type="text" class="input" name="accept" size="12" value="text/json,text/plain">
+                    content-type:<input type="text" class="input" name="content_type" size="6" value="text/json"><br>
+                    expires:<input type="text" class="input" name="expires" size="4" pattern="^\d+$" value="3600"><br>
+                </form>
+            </fieldset>
+
+            <fieldset>
+                <legend>subscribe</legend>
+                <form id="send_subscribe_form" onsubmit="event.preventDefault()">
+                    <button id="send_init_subscribe_btn" title="Send initial SUBSCRIBE">subscribe</button><br>
+                    <button id="send_initial_and_next_subscribe_btn" title="Send initial &amp; next subscribe">subscribe &amp; next</button>
+                    <button id="send_next_subscribe_btn" title="Send next SUBSCRIBE">next subscribe</button><br>
+                    <button id="send_unsubscribe_btn" title="Send un-SUBSCRIBE">un-subscribe</button>
+                </form>
+            </fieldset>
+            <fieldset>
+                <legend>notify</legend>
+                <form id="send_notify_form" onsubmit="event.preventDefault()">
+                    <button id="send_notify_btn" title="send NOTIFY">notify</button><br>
+                    <button id="send_final_notify_btn" title="Send final NOTIFY">final notify</button>
+                </form>
+            </fieldset>
+        </div>
+    </div>
+
+    <div id="video_view">
+        <video id="local_video" autoplay="" playsinline="" data-size="Small" style="position: static; width: 240px; height: 180px;"></video>
+        <video id="remote_video" autoplay="" playsinline="" data-size="Small" style="position: static; z-index: auto; width: 240px; height: 180px;"></video>
+    </div>
+
+
+<deepl-input-controller><template shadowrootmode="open"><link rel="stylesheet" href="chrome-extension://fancfknaplihpclbhbpclnmmjcjanbaf/build/content.css"><div dir="ltr"><div class="dl-input-translation-container svelte-95aucy"><div></div></div></div></template></deepl-input-controller></body></html>
