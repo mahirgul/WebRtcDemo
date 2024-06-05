@@ -739,11 +739,11 @@ function initSipStack(account) {
             }
 
             let screenSharingBtn = document.getElementById('screen_sharing_btn');
-            screenSharingBtn.value = 'Start screen sharing';
+            screenSharingBtn.value = 'Screen Share';
             screenSharingBtn.disabled = false;
 
             let sendVideoBtn = document.getElementById('send_video_btn');
-            sendVideoBtn.value = call.hasEnabledSendVideo() ? 'Stop sending video' : 'Start sending video';
+            sendVideoBtn.value = call.hasEnabledSendVideo() ? 'Stop Video' : 'Start Video';
             sendVideoBtn.disabled = !hasCamera;
 
             // restore button values to initial state
