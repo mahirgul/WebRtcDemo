@@ -155,7 +155,7 @@
 
         <div id="redirect_call_panel" class="panel" style="display: none;">
             <fieldset>
-                <legend>Redirect Call</legend>
+                <legend>Redirect Call:</legend>
                 <form id="redirect_form" onsubmit="event.preventDefault()">
                     <input type="text" class="form-control mb-2 mb-2 mr-2" class="input" name="redirect_to" placeholder="Redirect to">
                     <input id="do_redirect_btn" class="btn btn-primary mb-2 mr-2" type="button" value="Done">
@@ -165,7 +165,7 @@
 
         <div id="transfer_call_panel" class="panel" style="display: none;">
             <fieldset>
-                <legend>blind call transfer</legend>
+                <legend>Blind Call Transfer:</legend>
                 <form id="transfer_form" onsubmit="event.preventDefault()">
                     <input type="text" class="form-control  mb-2 mr-2" class="input" name="transfer_to" placeholder="Transfer to">
                     <input id="do_transfer_btn" type="button" class="btn btn-primary mb-2 mr-2" value="Done">
@@ -175,22 +175,23 @@
 
         <div id="call_established_panel" class="panel" style="display: none;">
             <div class="bg-light p-3 rounded">
-                <fieldset>
-                    <legend>open call</legend>
+                <fieldset>                    
                     <p id="call_established_user"></p>
                     <br>
                     <input id="hangup_btn" class="btn btn-danger mb-2 mr-2" type="button" value="Hangup" title="Terminate the call">
-                    <br>
+                    <input id="blind_transfer_btn" class="btn btn-warning mb-2 mr-2" type="button" value="Transfer" title="Call blind transfer - asks the other side to call someone">
+                    <input id="hold_btn" class="btn btn-secondary mb-2 mr-2" type="button" value="Hold" title="Hold/Unhold the call">
                     <input id="mute_audio_btn" class="btn btn-secondary mb-2 mr-2" type="button" value="Mute" title="Mute/Unmute microphone">
+                    <br>                    
                     <input id="info_btn" class="btn btn-info mb-2 mr-2" type="button" value="Info" title="Print to console call information [for debugging]">
                     <input id="stats_btn" class="btn btn-info mb-2 mr-2" type="button" value="Stats" title="Print to console call statistics [for debugging]">
                     <input id="codecs_btn" class="btn btn-info mb-2 mr-2" type="button" value="Codecs" title="Print to console selected codecs [for debugging]">
                     <input id="send_reinvite_btn" class="btn btn-secondary mb-2 mr-2" type="button" value="re-INVITE" title="Send SIP re-INVITE message [for debugging]">
-                    <input id="send_info_btn" class="btn btn-secondary mb-2 mr-2" type="button" value="Send INFO" title="Send SIP INFO">
-                    <input id="blind_transfer_btn" class="btn btn-warning mb-2 mr-2" type="button" value="Transfer" title="Call blind transfer - asks the other side to call someone">
-                    <input id="send_video_btn" class="btn btn-primary mb-2 mr-2" type="button" value="Send Video" title="Start/stop sending video">
-                    <input id="screen_sharing_btn" class="btn btn-primary mb-2 mr-2" type="button" value="Screen Share" title="Start/stop screen sharing">
-                    <input id="enable_receive_video_btn" class="btn btn-secondary mb-2 mr-2" type="button" value="Receive Video" title="Enable/Disable receive video">
+                    <br>
+                    <input id="send_info_btn" class="btn btn-secondary mb-2 mr-2" type="button" value="Send INFO" title="Send SIP INFO">                    
+                    <input id="send_video_btn" class="btn btn-primary mb-2 mr-2" type="button" value="Send Video" title="Send Video">
+                    <input id="screen_sharing_btn" class="btn btn-primary mb-2 mr-2" type="button" value="Screen Share" title="Screen Share">
+                    <input id="enable_receive_video_btn" class="btn btn-secondary mb-2 mr-2" type="button" value="Receive Video" title="Receive Video">
                     <span id="video_controls_span">
                         <input id="mute_video_btn" class="btn btn-secondary mb-2 mr-2" type="button" value="Mute video" title="Mute/unmute web camera">
                         <span>Hide local video</span><input type="checkbox" id="hide_local_video_ckb">
@@ -212,7 +213,7 @@
                             <option value="Reset Custom">Reset Custom</option>
                         </select>
                     </span>
-                    <input id="hold_btn" class="btn btn-secondary mb-2 mr-2" type="button" value="Hold" title="Hold/Unhold the call">
+                    
                     <br>
                     <input id="keypad_btn" class="btn btn-secondary mb-2 mr-2" type="button" value="Keypad" title="Open/Close key panel">
                 </fieldset>
@@ -303,4 +304,3 @@
     </div>
 
 
-<deepl-input-controller><template shadowrootmode="open"><link rel="stylesheet" href="chrome-extension://fancfknaplihpclbhbpclnmmjcjanbaf/build/content.css"><div dir="ltr"><div class="dl-input-translation-container svelte-95aucy"><div></div></div></div></template></deepl-input-controller></body></html>
