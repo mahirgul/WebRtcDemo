@@ -739,11 +739,11 @@ function initSipStack(account) {
             }
 
             let screenSharingBtn = document.getElementById('screen_sharing_btn');
-            screenSharingBtn.value = 'Screen Share';
+            screenSharingBtn.value = 'Start SS';
             screenSharingBtn.disabled = false;
 
             let sendVideoBtn = document.getElementById('send_video_btn');
-            sendVideoBtn.value = call.hasEnabledSendVideo() ? 'Stop Video' : 'Start Video';
+            sendVideoBtn.value = call.hasEnabledSendVideo() ? 'Stop S.Vid' : 'Start S.Vid';
             sendVideoBtn.disabled = !hasCamera;
 
             // restore button values to initial state
@@ -1067,7 +1067,7 @@ function initSipStack(account) {
             let sendVideoBtn = document.getElementById('send_video_btn');
             screenSharingBtn.value = 'Start screen sharing';
             screenSharingBtn.disabled = false;
-            sendVideoBtn.value = call.hasSendVideo() ? 'Stop sending video' : 'Start sending video';
+            sendVideoBtn.value = call.hasSendVideo() ? 'Stop S.Vid' : 'Start S.Vid';
             sendVideoBtn.disabled = !hasCamera;
             phone.closeScreenSharing(screenSharingStream);
             setEnableReceiveVideoButton();
@@ -1799,7 +1799,7 @@ function guiToggleSendVideo() {
         sendVideoBtn.disabled = true;
         activeCall.startSendingVideo()
             .then(() => {
-                sendVideoBtn.value = 'Stop sending video';
+                sendVideoBtn.value = 'Stop S.Vid';
                 guiShowVideoControls(activeCall);
                 guiShowLocalVideo(!userPref.hideLocalVideo);
                 let remoteVideo = document.getElementById('remote_video');
@@ -1816,7 +1816,7 @@ function guiToggleSendVideo() {
         sendVideoBtn.disabled = true;
         activeCall.stopSendingVideo()
             .then(() => {
-                sendVideoBtn.value = 'Start sending video';
+                sendVideoBtn.value = 'Start S.Vid';
                 guiShowVideoControls(activeCall);
                 guiShowLocalVideo(false);
                 let remoteVideo = document.getElementById('remote_video');
@@ -1861,13 +1861,13 @@ async function guiToggleScreenSharing() {
             })
             .then(() => {
                 screenSharingBtn.disabled = true;
-                sendVideoBtn.value = 'Start sending video';
+                sendVideoBtn.value = 'Start S.Vid';
                 sendVideoBtn.disabled = true;
                 return activeCall.startScreenSharing(screenSharingStream);
             })
             .then(() => {
-                screenSharingBtn.value = 'Stop screen sharing';
-                sendVideoBtn.value = 'Start sending video';
+                screenSharingBtn.value = 'Stop SS';
+                sendVideoBtn.value = 'Start S.Vid';
                 sendVideoBtn.disabled = true;
                 setEnableReceiveVideoButton();
                 // Optional check if other side receive the video.
@@ -1899,7 +1899,7 @@ function guiSendReInvite() {
 
 function setEnableReceiveVideoButton() {
     if (activeCall !== null)
-        document.getElementById('enable_receive_video_btn').value = (activeCall.hasEnabledReceiveVideo() ? 'Disable' : 'Enable') + ' receive video';
+        document.getElementById('enable_receive_video_btn').value = (activeCall.hasEnabledReceiveVideo() ? 'Disable' : 'Enable') + ' R.Vid';
 }
 
 function guiEnableReceiveVideo() {
