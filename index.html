@@ -31,7 +31,9 @@
     <!--
         HTML components of simple GUI
     -->
-    <div id="status_line" class="bg-info text-white text-center py-2">Please set user, display-name and password, and optional authorization name.</div>
+    <div id="status_line" class="bg-info text-white text-center py-2">
+        Please set user, display-name and password, and optional authorization name.
+    </div>
 
     <!-- All panels are hidden, except one  -->
     <div id="panels" class="container mt-3">
@@ -132,17 +134,14 @@
 
         <div id="outgoing_call_panel" class="panel" style="display: none;">
             <fieldset>
-                <legend>Call Started:</legend>
                 <p id="outgoing_call_user"></p>
                 <p id="outgoing_call_progress"></p>
-                <br>
                 <input id="cancel_outgoing_call_btn" class="btn btn-danger mb-2 mr-2" type="button" value="Cancel">
             </fieldset>
         </div>
 
         <div id="incoming_call_panel" class="panel" style="display: none;">
             <fieldset>
-                <legend>Incoming Call:</legend>
                 <p id="incoming_call_user"></p>
                 <br>
                 <input id="accept_audio_btn" class="btn btn-success mb-2 mr-2" type="button" value="Accept Audio">
@@ -175,9 +174,8 @@
 
         <div id="call_established_panel" class="panel" style="display: none;">
             <div class="bg-light p-3 rounded">
-                <fieldset>                    
-                    <p id="call_established_user"></p>
-                    <br>
+                <fieldset>                   
+                    
                     <input id="hangup_btn" class="btn btn-danger mb-2 mr-2" type="button" value="Hangup" title="Terminate the call">
                     <input id="blind_transfer_btn" class="btn btn-warning mb-2 mr-2" type="button" value="Transfer" title="Call blind transfer - asks the other side to call someone">
                     <input id="hold_btn" class="btn btn-secondary mb-2 mr-2" type="button" value="Hold" title="Hold/Unhold the call">

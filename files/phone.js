@@ -712,9 +712,9 @@ function initSipStack(account) {
             }
             //-------------- End of X-Genesys-CallUUID --------
 
-            guiInfo('');
+            //guiInfo('');
             if (call === transferCall) {
-                guiInfo('call transferred')
+                guiInfo('Call Transferred')
                 ac_log('transfer call is established. Set it as active call');
                 activeCall = call;
                 transferCall = null;
@@ -723,7 +723,7 @@ function initSipStack(account) {
                 let user = call.data['_user'];
                 let dn = call.data['_display_name']; // optional
                 let caller = dn ? `"${dn}" ${user}` : user;
-                document.getElementById('call_established_user').innerText = caller;
+                guiInfo('Call Transferred' + caller) ;
             }
             audioPlayer.stop();
 
@@ -735,7 +735,7 @@ function initSipStack(account) {
             guiShowLocalVideo(call.hasSendVideo() && !userPref.hideLocalVideo);
 
             if (call.data['open_replaced']) {
-                guiInfo('call is replaced');
+                guiInfo('Call is replaced');
             }
 
             let screenSharingBtn = document.getElementById('screen_sharing_btn');
@@ -854,7 +854,7 @@ function initSipStack(account) {
             }
 
             // Incoming call
-            guiInfo('');
+            //guiInfo('');
             activeCall = call;
 
             // Can be used custom header in incoming INVITE
@@ -896,7 +896,7 @@ function initSipStack(account) {
             let caller = dn ? `"${dn}" ${user}` : user;
 
             document.getElementById('incoming_call_user').innerText = caller;
-            document.getElementById('call_established_user').innerText = caller;
+            guiInfo('Incoming Call From:'+caller) ;
             document.getElementById('accept_video_btn').disabled = !hasCamera || !call.hasVideo();
             document.getElementById('accept_recvonly_video_btn').disabled = !call.hasVideo();
             guiShowPanel('incoming_call_panel');
@@ -1652,7 +1652,7 @@ function guiRestoreCall(restoreData) {
     ac_log('Trying to restore call', restore);
     document.getElementById('outgoing_call_user').innerText = restore.callTo;
     document.getElementById('outgoing_call_progress').innerText = '';
-    document.getElementById('call_established_user').innerText = restore.callTo;
+    guiInfo('Call Restored: '+restore.callTo);
     let videoOption = hasCamera && (restore.video === 'sendrecv' || restore.video === 'sendonly') ? phone.VIDEO : phone.AUDIO;
     guiMakeCallTo(restore.callTo, videoOption, ['Replaces: ' + restore.replaces], { 'restoreCall': restore });
     return true;
@@ -1668,7 +1668,7 @@ function guiMakeCall(videoOption) {
     document.querySelector('#call_form [name=call_to]').value = '';
     document.getElementById('outgoing_call_user').innerText = callTo;
     document.getElementById('outgoing_call_progress').innerText = '';
-    document.getElementById('call_established_user').innerText = callTo;
+    guiInfo('Call Started: '+callTo);;
     guiMakeCallTo(callTo, videoOption);
 }
 
@@ -1676,7 +1676,6 @@ function guiMakeCallTo(callTo, videoOption, extraHeaders = null, extraData = nul
     document.getElementById('local_video').style.display = 'block';
     document.getElementById('remote_video').style.display = 'block';
 
-    guiInfo('');
     guiShowPanel('outgoing_call_panel');
 
     // Some extra headers to testing. Please don't use the test strings in production !
@@ -1793,7 +1792,7 @@ function guiToggleSendVideo() {
         ac_log('send video: no active call');
         return;
     }
-    guiInfo('');
+    //guiInfo('');
     let sendVideoBtn = document.getElementById('send_video_btn');
     if (!activeCall.hasEnabledSendVideo()) {
         sendVideoBtn.disabled = true;
@@ -1848,7 +1847,7 @@ async function guiToggleScreenSharing() {
     }
     let screenSharingBtn = document.getElementById('screen_sharing_btn');
     let sendVideoBtn = document.getElementById('send_video_btn');
-    guiInfo('');
+    //guiInfo('');
     if (!activeCall.isScreenSharing()) {
         return Promise.resolve()
             .then(() => {
@@ -2551,7 +2550,7 @@ function guiSendMessage() {
 //--------------- SUBSCRIBE/NOTIFY examples -------------------------------
 function guiSubscribePanel() {
     guiEnableSound();
-    guiInfo('');
+    //guiInfo('');
     guiShowPanel('subscribe_panel');
     guiSubscribeButtons();
 }
