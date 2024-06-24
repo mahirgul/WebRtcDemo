@@ -20,9 +20,16 @@ function initializeJsSIP() {
   ua.on('newRTCSession', (data) => {
     if (data.originator === 'remote') {
       incomingSession = data.session;
-      showIncomingCall();
+      showIncomingCall(data.request.from.display_name || data.request.from.uri.user);
+      updateStatusBar(`Incoming call from ${data.request.from.display_name || data.request.from.uri.user}`);
     }
   });
+
+  ua.on('connected', () => updateStatusBar('Connected'));
+  ua.on('disconnected', () => updateStatusBar('Disconnected'));
+  ua.on('registered', () => updateStatusBar('Registered'));
+  ua.on('unregistered', () => updateStatusBar('Unregistered'));
+  ua.on('registrationFailed', () => updateStatusBar('Registration failed'));
 }
 
 function makeCall() {
@@ -35,17 +42,21 @@ function makeCall() {
       document.getElementById('callButton').classList.add('d-none');
       document.getElementById('closeButton').classList.remove('d-none');
       document.getElementById('holdButton').classList.remove('d-none');
+      updateStatusBar('Calling...');
     },
     failed: () => {
       console.log('call failed');
       resetCallUI();
+      updateStatusBar('Call failed');
     },
     ended: () => {
       console.log('call ended');
       resetCallUI();
+      updateStatusBar('Call ended');
     },
     confirmed: () => {
       console.log('call confirmed');
+      updateStatusBar('In call');
     },
   };
 
@@ -61,6 +72,7 @@ function hangupCall() {
   if (session) {
     session.terminate();
     resetCallUI();
+    updateStatusBar('Call ended');
   }
 }
 
@@ -72,8 +84,20 @@ function answerCall() {
     session = incomingSession;
     incomingSession = null;
     document.getElementById('answerButton').classList.add('d-none');
+    document.getElementById('rejectButton').classList.add('d-none');
     document.getElementById('closeButton').classList.remove('d-none');
     document.getElementById('holdButton').classList.remove('d-none');
+    document.getElementById('transferControls').classList.remove('d-none');
+    updateStatusBar('In call');
+  }
+}
+
+function rejectCall() {
+  if (incomingSession) {
+    incomingSession.terminate();
+    incomingSession = null;
+    resetCallUI();
+    updateStatusBar('Call rejected');
   }
 }
 
@@ -83,10 +107,12 @@ function toggleHold() {
       session.hold();
       document.getElementById('holdButton').textContent = 'Unhold';
       isOnHold = true;
+      updateStatusBar('Call on hold');
     } else {
       session.unhold();
       document.getElementById('holdButton').textContent = 'Hold';
       isOnHold = false;
+      updateStatusBar('In call');
     }
   }
 }
@@ -95,6 +121,7 @@ function transferCall() {
   const transferNumber = document.getElementById('transferNumber').value;
   if (session) {
     session.refer(`sip:${transferNumber}@sipserver.com`);
+    updateStatusBar('Call transferred');
   }
 }
 
@@ -128,10 +155,12 @@ function showSettingsDiv() {
   document.getElementById('callDiv').style.transform = 'translateX(-100%)';
 }
 
-function showIncomingCall() {
+function showIncomingCall(caller) {
   document.getElementById('answerButton').classList.remove('d-none');
+  document.getElementById('rejectButton').classList.remove('d-none');
   document.getElementById('callButton').classList.add('d-none');
   document.getElementById('closeButton').classList.add('d-none');
+  updateStatusBar(`Incoming call from ${caller}`);
 }
 
 function resetCallUI() {
@@ -139,10 +168,15 @@ function resetCallUI() {
   document.getElementById('callButton').classList.remove('d-none');
   document.getElementById('closeButton').classList.add('d-none');
   document.getElementById('answerButton').classList.add('d-none');
+  document.getElementById('rejectButton').classList.add('d-none');
   document.getElementById('holdButton').classList.add('d-none');
   document.getElementById('holdButton').textContent = 'Hold';
   session = null;
   isOnHold = false;
+}
+
+function updateStatusBar(message) {
+  document.getElementById('statusBar').textContent = message;
 }
 
 document.addEventListener('DOMContentLoaded', () => {

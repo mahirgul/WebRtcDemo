@@ -10,7 +10,7 @@
 <body>
   <div class="container-fluid softphone-container">
     <div class="d-flex justify-content-between align-items-center softphone-header">
-      <span>Softphone</span>
+      <span id="statusBar">Softphone</span>
       <div>
         <button name="phoneBtn" class="icon-btn" onclick="showCallDiv()">
           <span class="icon">&#9742;</span>
@@ -23,14 +23,15 @@
     <div class="content">
       <div id="callDiv" class="content-div">
         <div class="display mb-2 d-flex align-items-center">
-          <input type="text" class="form-control form-control-sm mr-2" id="phoneNumber">
+          <input type="text" class="form-control form-control-sm mr-2" id="phoneNumber" placeholder="Enter number">
           <button id="callButton" class="call-button btn-sm" onclick="makeCall()">Call</button>
           <button id="closeButton" class="close-button btn-sm d-none" onclick="hangupCall()">Close</button>
           <button id="answerButton" class="answer-button btn-sm d-none" onclick="answerCall()">Answer</button>
+          <button id="rejectButton" class="reject-button btn-sm d-none" onclick="rejectCall()">Reject</button>
           <button id="holdButton" class="hold-button btn-sm d-none" onclick="toggleHold()">Hold</button>
         </div>
-        <div id="transferControls" class="d-none mt-2">
-          <input type="text" id="transferNumber" class="form-control form-control-sm d-inline-block mx-1" placeholder="Transfer Number">
+        <div id="transferControls" class="d-none mt-2 d-flex align-items-center">
+          <input type="text" id="transferNumber" class="form-control form-control-sm mr-2" placeholder="Transfer Number">
           <button class="transfer-button btn-sm" onclick="transferCall()">Transfer</button>
         </div>
       </div>
