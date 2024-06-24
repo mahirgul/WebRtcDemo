@@ -1,0 +1,83 @@
+body {
+  background-color: #F3F3F7;
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+}
+
+.softphone-container {
+  width: 100%;
+  max-width: 400px;
+  margin: 5px auto;
+  padding: 10px;
+  border-radius: 15px;
+  background-color: #fff;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.softphone-header {
+  color: #6E313D;
+  font-size: 18px;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  margin: 0 5px;
+}
+
+.icon-btn .icon {
+  font-size: 24px;
+  color: #6E313D;
+}
+
+.controls button {
+  margin: 2px;
+  padding: 3px 5px;
+  font-size: 12px;
+  border: none;
+  border-radius: 10px;
+  color: white;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.call-button {
+  background-color: #28a745; /* Yeşil */
+}
+
+.close-button {
+  background-color: #dc3545; /* Kırmızı */
+}
+
+.answer-button {
+  background-color: #007bff; /* Mavi */
+}
+
+.hold-button {
+  background-color: #ffc107; /* Sarı */
+}
+
+.transfer-button {
+  background-color: #D24661;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 3px 5px;
+  margin-left: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.content-div {
+  transition: transform 0.5s ease-in-out;
+}
+
+.d-none {
+  display: none;
+}
+
+input.form-control-sm {
+  font-size: 12px;
+}
