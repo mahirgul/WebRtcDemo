@@ -3,11 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Softphone App</title>
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<button id="toggleButton" class="btn btn-primary">
+        <i class="arrow arrow-down"></i>
+    </button>
+	<div id="toggleDiv">
+       
   <div class="container-fluid softphone-container">
     <div class="d-flex justify-content-between align-items-center softphone-header">
       <span id="statusBar">Softphone</span>
@@ -36,24 +44,34 @@
         </div>
       </div>
       <div id="settingsDiv" class="content-div d-none">
-        <div class="form-group">
-          <label for="sipUri">SIP URI</label>
-          <input type="text" class="form-control form-control-sm" id="sipUri" placeholder="sip:username@sipserver.com">
-        </div>
-        <div class="form-group">
-          <label for="sipPassword">Password</label>
-          <input type="password" class="form-control form-control-sm" id="sipPassword" placeholder="Password">
-        </div>
-        <div class="form-group">
-          <label for="wssServer">WSS Server</label>
-          <input type="text" class="form-control form-control-sm" id="wssServer" placeholder="wss://sipserver.com">
-        </div>
+        <div class="display mb-2 d-flex align-items-left">
+          
+        <input type="text" class="form-control form-control-sm mr-2" id="sipUri" placeholder="sip:username@sipserver.com">
+        <label for="sipUri">SIP URI</label>
+          </div>
+		          <div class="display mb-2 d-flex align-items-left">
+        <input type="password" class="form-control form-control-sm mr-2" id="sipPassword" placeholder="Password">
+		<label for="sipPassword">Password</label>
+          </div>
+		          <div class="display mb-2 d-flex align-items-left">
+
+        <input type="text" class="form-control form-control-sm mr-2" id="wssServer" placeholder="wss://sipserver.com">
+		<label for="wssServer">WSS Server</label>
         <button class="btn btn-primary btn-sm" onclick="saveSettings()">Save</button>
+
+        </div>
       </div>
     </div>
   </div>
+    </div>
+  <audio id="ringtone" src="ringtone.mp3" preload="auto"></audio>
 
   <script src="jssip-3.10.0.min.js"></script>
   <script src="app.js"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+ 
 </body>
 </html>

@@ -3,6 +3,8 @@ let session = null;
 let incomingSession = null;
 let isOnHold = false;
 
+
+
 function initializeJsSIP() {
   const sipUri = localStorage.getItem('sipUri') || 'sip:username@sipserver.com';
   const sipPassword = localStorage.getItem('sipPassword') || 'password';
@@ -20,8 +22,10 @@ function initializeJsSIP() {
   ua.on('newRTCSession', (data) => {
     if (data.originator === 'remote') {
       incomingSession = data.session;
-      showIncomingCall(data.request.from.display_name || data.request.from.uri.user);
-      updateStatusBar(`Incoming call from ${data.request.from.display_name || data.request.from.uri.user}`);
+      const caller = data.request.from.display_name || data.request.from.uri.user;
+      showIncomingCall(caller);
+      updateStatusBar(`Incoming call from ${caller}`);
+      playRingtone();
     }
   });
 
@@ -88,6 +92,7 @@ function answerCall() {
     document.getElementById('closeButton').classList.remove('d-none');
     document.getElementById('holdButton').classList.remove('d-none');
     document.getElementById('transferControls').classList.remove('d-none');
+    stopRingtone();
     updateStatusBar('In call');
   }
 }
@@ -97,6 +102,7 @@ function rejectCall() {
     incomingSession.terminate();
     incomingSession = null;
     resetCallUI();
+    stopRingtone();
     updateStatusBar('Call rejected');
   }
 }
@@ -179,7 +185,58 @@ function updateStatusBar(message) {
   document.getElementById('statusBar').textContent = message;
 }
 
+function playRingtone() {
+  const ringtone = document.getElementById('ringtone');
+  ringtone.play();
+}
+
+function stopRingtone() {
+  const ringtone = document.getElementById('ringtone');
+  ringtone.pause();
+  ringtone.currentTime = 0;
+}
+
+function sendDTMF(digit) {
+  if (session && session.isInProgress()) {
+    session.sendDTMF(digit);
+    console.log(`Sent DTMF: ${digit}`);
+  }
+}
+
+document.getElementById('phoneNumber').addEventListener('input', (event) => {
+  const validChars = '0123456789*#';
+  const input = event.target.value;
+  const lastChar = input.slice(-1);
+  if (validChars.includes(lastChar)) {
+    sendDTMF(lastChar);
+  } else {
+    event.target.value = input.slice(0, -1); // Remove invalid character
+  }
+});
+
 document.addEventListener('DOMContentLoaded', () => {
   initializeJsSIP();
   showCallDiv(); // Load call div by default on page load
 });
+
+  document.getElementById('toggleButton').addEventListener('click', function() {
+            var toggleDiv = document.getElementById('toggleDiv');
+            var toggleButton = document.getElementById('toggleButton');
+            var arrowIcon = toggleButton.querySelector('.arrow');
+            
+            if (toggleDiv.classList.contains('visible')) {
+                toggleDiv.classList.remove('visible');
+                toggleButton.style.top = '-5px'; // Butonu başlangıç konumuna getir
+				toggleDiv.style.top = '-200px'; // Butonu başlangıç konumuna getir
+
+                arrowIcon.classList.remove('arrow-up');
+                arrowIcon.classList.add('arrow-down');
+            } else {
+                toggleDiv.classList.add('visible');
+                toggleButton.style.top = '193px'; // Buton div ile birlikte hareket eder
+				toggleDiv.style.top = '0px'; // Butonu başlangıç konumuna getir
+				
+                arrowIcon.classList.remove('arrow-down');
+                arrowIcon.classList.add('arrow-up');
+            }
+        });

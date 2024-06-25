@@ -80,3 +80,50 @@ input.form-control-sm {
   width: 200px; /* Sabit genişlik */
   display: inline-block;
 }
+
+ #toggleButton {
+            position: fixed;
+            top: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 5px 26px;
+            font-size: 10px;
+            cursor: pointer;
+            z-index: 99;
+            transition: top 0.7s ease;
+			border-radius: 0px 0 10px 10px; /* Kenarları yuvarlak yapmak için */
+        }
+
+        #toggleDiv {
+            position: fixed;
+            top: -200px; /* div'in yüksekliği */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 200px;
+            background-color: #f9f9f9;
+            text-align: center;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: top 0.7s ease;
+            z-index: 98;
+			border-radius: 0px 0 10px 10px; /* Kenarları yuvarlak yapmak için */
+
+        }
+
+        .arrow-down, .arrow-up {
+            border: solid white;
+            border-width: 0 6px 6px 0;
+            display: inline-block;
+            padding: 5px;
+        }
+
+        .arrow-down {
+            transform: rotate(45deg);
+            -webkit-transform: rotate(45deg);
+        }
+
+        .arrow-up {
+            transform: rotate(-135deg);
+            -webkit-transform: rotate(-135deg);
+        }
