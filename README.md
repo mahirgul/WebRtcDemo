@@ -1,6 +1,6 @@
 WebRTC web phone sample
 
-https://i.imgur.com/s6tFsci.gif
+![image](https://i.imgur.com/s6tFsci.gif)
 
 [You can try with this link.](https://mhrgl.com/phone/)
 
