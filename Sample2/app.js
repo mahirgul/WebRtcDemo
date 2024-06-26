@@ -219,24 +219,24 @@ document.addEventListener('DOMContentLoaded', () => {
   showCallDiv(); // Load call div by default on page load
 });
 
-  document.getElementById('toggleButton').addEventListener('click', function() {
-            var toggleDiv = document.getElementById('toggleDiv');
-            var toggleButton = document.getElementById('toggleButton');
-            var arrowIcon = toggleButton.querySelector('.arrow');
-            
-            if (toggleDiv.classList.contains('visible')) {
-                toggleDiv.classList.remove('visible');
-                toggleButton.style.top = '-5px'; // Butonu başlangıç konumuna getir
-				toggleDiv.style.top = '-200px'; // Butonu başlangıç konumuna getir
+document.getElementById('toggleButton').addEventListener('click', function () {
+  var toggleDiv = document.getElementById('toggleDiv');
+  var toggleButton = document.getElementById('toggleButton');
+  var arrowIcon = toggleButton.querySelector('.arrow');
 
-                arrowIcon.classList.remove('arrow-up');
-                arrowIcon.classList.add('arrow-down');
-            } else {
-                toggleDiv.classList.add('visible');
-                toggleButton.style.top = '193px'; // Buton div ile birlikte hareket eder
-				toggleDiv.style.top = '0px'; // Butonu başlangıç konumuna getir
-				
-                arrowIcon.classList.remove('arrow-down');
-                arrowIcon.classList.add('arrow-up');
-            }
-        });
+  if (toggleDiv.classList.contains('visible')) {
+    toggleDiv.classList.remove('visible');
+    toggleButton.style.top = '-5px'; // Butonu başlangıç konumuna getir
+    toggleDiv.style.top = '-200px'; // Butonu başlangıç konumuna getir
+
+    arrowIcon.classList.remove('arrow-up');
+    arrowIcon.classList.add('arrow-down');
+  } else {
+    toggleDiv.classList.add('visible');
+    toggleButton.style.top = '193px'; // Buton div ile birlikte hareket eder
+    toggleDiv.style.top = '0px'; // Butonu başlangıç konumuna getir
+
+    arrowIcon.classList.remove('arrow-down');
+    arrowIcon.classList.add('arrow-up');
+  }
+});

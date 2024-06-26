@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,68 +11,73 @@
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-<button id="toggleButton" class="btn btn-primary">
-        <i class="arrow arrow-down"></i>
-    </button>
-	<div id="toggleDiv">
-       
-  <div class="container-fluid softphone-container">
-    <div class="d-flex justify-content-between align-items-center softphone-header">
-      <span id="statusBar">Softphone</span>
-      <div>
-        <button name="phoneBtn" class="icon-btn" onclick="showCallDiv()">
-          <span class="icon">&#9742;</span>
-        </button>
-        <button name="settingsBtn" class="icon-btn" onclick="showSettingsDiv()">
-          <span class="icon">&#9881;</span>
-        </button>
-      </div>
-    </div>
-    <div class="content">
-      <div id="callDiv" class="content-div">
-        <div class="display mb-2 d-flex align-items-center">
-          <input type="text" class="form-control form-control-sm mr-2" id="phoneNumber" placeholder="Enter number">
-          <button id="callButton" class="call-button btn-sm" onclick="makeCall()">Call</button>
-          <button id="closeButton" class="close-button btn-sm d-none" onclick="hangupCall()">Close</button>
-          <button id="answerButton" class="answer-button btn-sm d-none" onclick="answerCall()">Answer</button>
-          <button id="rejectButton" class="reject-button btn-sm d-none" onclick="rejectCall()">Reject</button>
-          <button id="holdButton" class="hold-button btn-sm d-none" onclick="toggleHold()">Hold</button>
-        </div>
-        <div id="transferControls" class="d-none mt-2 d-flex align-items-center">
-          <input type="text" id="transferNumber" class="form-control form-control-sm mr-2" placeholder="Transfer Number">
-          <button class="transfer-button btn-sm" onclick="transferCall()">Transfer</button>
+  <button id="toggleButton" class="btn btn-primary">
+    <i class="arrow arrow-down"></i>
+  </button>
+  <div id="toggleDiv">
+
+    <div class="container-fluid softphone-container">
+      <div class="d-flex justify-content-between align-items-center softphone-header">
+        <span id="statusBar">Softphone</span>
+        <div>
+          <button name="phoneBtn" class="icon-btn" onclick="showCallDiv()">
+            <span class="icon">&#9742;</span>
+          </button>
+          <button name="settingsBtn" class="icon-btn" onclick="showSettingsDiv()">
+            <span class="icon">&#9881;</span>
+          </button>
         </div>
       </div>
-      <div id="settingsDiv" class="content-div d-none">
-        <div class="display mb-2 d-flex align-items-left">
-          
-        <input type="text" class="form-control form-control-sm mr-2" id="sipUri" placeholder="sip:username@sipserver.com">
-        <label for="sipUri">SIP URI</label>
+      <div class="content">
+        <div id="callDiv" class="content-div">
+          <div class="display mb-2 d-flex align-items-center">
+            <input type="text" class="form-control form-control-sm mr-2" id="phoneNumber" placeholder="Enter number">
+            <button id="callButton" class="call-button btn-sm" onclick="makeCall()">Call</button>
+            <button id="closeButton" class="close-button btn-sm d-none" onclick="hangupCall()">Close</button>
+            <button id="answerButton" class="answer-button btn-sm d-none" onclick="answerCall()">Answer</button>
+            <button id="rejectButton" class="reject-button btn-sm d-none" onclick="rejectCall()">Reject</button>
+            <button id="holdButton" class="hold-button btn-sm d-none" onclick="toggleHold()">Hold</button>
           </div>
-		          <div class="display mb-2 d-flex align-items-left">
-        <input type="password" class="form-control form-control-sm mr-2" id="sipPassword" placeholder="Password">
-		<label for="sipPassword">Password</label>
+          <div id="transferControls" class="d-none mt-2 d-flex align-items-center">
+            <input type="text" id="transferNumber" class="form-control form-control-sm mr-2"
+              placeholder="Transfer Number">
+            <button class="transfer-button btn-sm" onclick="transferCall()">Transfer</button>
           </div>
-		          <div class="display mb-2 d-flex align-items-left">
+        </div>
+        <div id="settingsDiv" class="content-div d-none">
+          <div class="display mb-2 d-flex align-items-left">
 
-        <input type="text" class="form-control form-control-sm mr-2" id="wssServer" placeholder="wss://sipserver.com">
-		<label for="wssServer">WSS Server</label>
-        <button class="btn btn-primary btn-sm" onclick="saveSettings()">Save</button>
+            <input type="text" class="form-control form-control-sm mr-2" id="sipUri"
+              placeholder="sip:username@sipserver.com">
+            <label for="sipUri">SIP URI</label>
+          </div>
+          <div class="display mb-2 d-flex align-items-left">
+            <input type="password" class="form-control form-control-sm mr-2" id="sipPassword" placeholder="Password">
+            <label for="sipPassword">Password</label>
+          </div>
+          <div class="display mb-2 d-flex align-items-left">
 
+            <input type="text" class="form-control form-control-sm mr-2" id="wssServer"
+              placeholder="wss://sipserver.com">
+            <label for="wssServer">WSS Server</label>
+            <button class="btn btn-primary btn-sm" onclick="saveSettings()">Save</button>
+
+          </div>
         </div>
       </div>
     </div>
   </div>
-    </div>
   <audio id="ringtone" src="ringtone.mp3" preload="auto"></audio>
 
   <script src="jssip-3.10.0.min.js"></script>
   <script src="app.js"></script>
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
- 
+
 </body>
+
 </html>
