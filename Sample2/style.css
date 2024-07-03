@@ -6,9 +6,9 @@ body {
 
 .softphone-container {
   width: 100%;
-  margin: 5px auto;
+  margin: 0px auto;
   padding: 10px;
-  border-radius: 15px;
+  border-radius: 0px 0px 10px 10px;
   background-color: #fff;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -20,51 +20,45 @@ body {
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.icon-btn {
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  margin: 0 5px;
-}
-
-.icon-btn .icon {
-  font-size: 24px;
-  color: #6E313D;
-}
-
 button {
   color: white;
   border: none;
   border-radius: 10px;
   padding: 3px 5px;
   margin-left: 10px;
-  width: 80px; /* Sabit genişlik */
-  box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.1);  
+  width: 80px;
+  /* Sabit genişlik */
+  box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.1);
 }
 
 .call-button {
-  background-color: #85C1E9; /* Soft mavi */
+  background-color: #85C1E9;
+  /* Soft mavi */
 }
 
 .close-button {
-  background-color: #F1948A; /* Soft kırmızı */
+  background-color: #F1948A;
+  /* Soft kırmızı */
 }
 
 .answer-button {
-  background-color: #AED6F1; /* Soft mavi */
+  background-color: #AED6F1;
+  /* Soft mavi */
 }
 
 .reject-button {
-  background-color: #F1948A; /* Soft kırmızı */
+  background-color: #F1948A;
+  /* Soft kırmızı */
 }
 
 .hold-button {
-  background-color: #F7DC6F; /* Soft sarı */
+  background-color: #F7DC6F;
+  /* Soft sarı */
 }
 
 .transfer-button {
-  background-color: #F5B7B1; /* Soft kırmızı */  
+  background-color: #F5B7B1;
+  /* Soft kırmızı */
 }
 
 .content-div {
@@ -77,53 +71,71 @@ button {
 
 input.form-control-sm {
   font-size: 12px;
-  width: 200px; /* Sabit genişlik */
+  width: 200px;
+  /* Sabit genişlik */
   display: inline-block;
 }
 
- #toggleButton {
-            position: fixed;
-            top: -5px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 5px 26px;
-            font-size: 10px;
-            cursor: pointer;
-            z-index: 99;
-            transition: top 0.7s ease;
-			border-radius: 0px 0 10px 10px; /* Kenarları yuvarlak yapmak için */
-        }
+#toggleButton {
+  position: fixed;
+  top: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 5px 26px;
+  font-size: 10px;
+  cursor: pointer;
+  z-index: 99;
+  transition: top 0.7s ease;
+  border-radius: 0px 0 10px 10px;
+  /* Kenarları yuvarlak yapmak için */
+}
 
-        #toggleDiv {
-            position: fixed;
-            top: -200px; /* div'in yüksekliği */
-            left: 50%;
-            transform: translateX(-50%);
-            width: 600px;
-            height: 200px;
-            background-color: #f9f9f9;
-            text-align: center;
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: top 0.7s ease;
-            z-index: 98;
-			border-radius: 0px 0 10px 10px; /* Kenarları yuvarlak yapmak için */
+#toggleDiv {
+  position: fixed;
+  top: -200px;
+  /* div'in yüksekliği */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 200px;
+  background-color: #f9f9f9;
+  text-align: center;
+  padding: 0px 10px 0px 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: top 0.7s ease;
+  z-index: 98;
+  border-radius: 0px 0 10px 10px;
+  /* Kenarları yuvarlak yapmak için */
 
-        }
+}
 
-        .arrow-down, .arrow-up {
-            border: solid white;
-            border-width: 0 6px 6px 0;
-            display: inline-block;
-            padding: 5px;
-        }
+.arrow-down,
+.arrow-up {
+  border: solid white;
+  border-width: 0 6px 6px 0;
+  display: inline-block;
+  padding: 5px;
+}
 
-        .arrow-down {
-            transform: rotate(45deg);
-            -webkit-transform: rotate(45deg);
-        }
+.arrow-down {
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+}
 
-        .arrow-up {
-            transform: rotate(-135deg);
-            -webkit-transform: rotate(-135deg);
-        }
+.arrow-up {
+  transform: rotate(-135deg);
+  -webkit-transform: rotate(-135deg);
+}
+
+.icon {
+  background-color: #f9f9f9;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  margin: 0;
+  font-size: 20px;
+  color: #6E313D;  
+  margin-left: 0px;
+  width: 30px;
+  /* Sabit genişlik */
+}

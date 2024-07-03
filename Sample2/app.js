@@ -147,6 +147,7 @@ function showCallDiv() {
   document.getElementById('callDiv').style.transform = 'translateX(0)';
   document.getElementById('settingsDiv').classList.add('d-none');
   document.getElementById('settingsDiv').style.transform = 'translateX(100%)';
+  document.getElementById('saveBtn').classList.add('d-none');
 
   // Load settings from localStorage
   document.getElementById('sipUri').value = localStorage.getItem('sipUri') || '';
@@ -159,6 +160,8 @@ function showSettingsDiv() {
   document.getElementById('settingsDiv').style.transform = 'translateX(0)';
   document.getElementById('callDiv').classList.add('d-none');
   document.getElementById('callDiv').style.transform = 'translateX(-100%)';
+  document.getElementById('saveBtn').classList.remove('d-none');
+
 }
 
 function showIncomingCall(caller) {
