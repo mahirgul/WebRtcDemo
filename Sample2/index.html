@@ -30,7 +30,6 @@
           <button name="settingsBtn" class="icon" onclick="showSettingsDiv()">
             <span class="icon">&#9881;</span>
           </button>
-
         </div>
       </div>
       <div class="content">
@@ -44,16 +43,13 @@
             <button id="holdButton" class="hold-button btn-sm d-none" onclick="toggleHold()">Hold</button>
           </div>
           <div id="transferControls" class="d-none mt-2 d-flex align-items-center">
-            <input type="text" id="transferNumber" class="form-control form-control-sm mr-2"
-              placeholder="Transfer Number">
+            <input type="text" id="transferNumber" class="form-control form-control-sm mr-2" placeholder="Transfer Number">
             <button class="transfer-button btn-sm" onclick="transferCall()">Transfer</button>
           </div>
         </div>
         <div id="settingsDiv" class="content-div d-none">
           <div class="display mb-2 d-flex align-items-left">
-
-            <input type="text" class="form-control form-control-sm mr-2" id="sipUri"
-              placeholder="sip:username@sipserver.com">
+            <input type="text" class="form-control form-control-sm mr-2" id="sipUri" placeholder="sip:username@sipserver.com">
             <label for="sipUri">SIP URI</label>
           </div>
           <div class="display mb-2 d-flex align-items-left">
@@ -61,16 +57,17 @@
             <label for="sipPassword">Password</label>
           </div>
           <div class="display mb-2 d-flex align-items-left">
-
-            <input type="text" class="form-control form-control-sm mr-2" id="wssServer"
-              placeholder="wss://sipserver.com">
+            <input type="text" class="form-control form-control-sm mr-2" id="wssServer" placeholder="wss://sipserver.com">
             <label for="wssServer">WSS Server</label>
-
-
           </div>
         </div>
       </div>
     </div>
+  </div>
+  <div id="videoDiv" class="content-div">
+    <video id="localVideo" width="280" height="210" autoplay muted></video>
+    <video id="remoteVideo" width="280" height="210"></video>
+    <button id="endVideoCallButton" onclick="endVideoCall()">End Call</button>
   </div>
   <audio id="ringtone" src="ringtone.mp3" preload="auto"></audio>
 
@@ -79,8 +76,6 @@
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
-
 </body>
 
 </html>

@@ -3,8 +3,6 @@ let session = null;
 let incomingSession = null;
 let isOnHold = false;
 
-
-
 function initializeJsSIP() {
   const sipUri = localStorage.getItem('sipUri') || 'sip:username@sipserver.com';
   const sipPassword = localStorage.getItem('sipPassword') || 'password';
@@ -19,21 +17,35 @@ function initializeJsSIP() {
   ua = new JsSIP.UA(configuration);
   ua.start();
 
+  ua.on('connected', () => logStatus('UA connected'));
+  ua.on('disconnected', () => logStatus('UA disconnected'));
+  ua.on('registered', () => logStatus('UA registered'));
+  ua.on('unregistered', () => logStatus('UA unregistered'));
+  ua.on('registrationFailed', () => logStatus('UA registration failed'));
+
   ua.on('newRTCSession', (data) => {
+    logStatus(data.originator);
+
     if (data.originator === 'remote') {
       incomingSession = data.session;
       const caller = data.request.from.display_name || data.request.from.uri.user;
       showIncomingCall(caller);
-      updateStatusBar(`Incoming call from ${caller}`);
+      logStatus(`Incoming call from ${caller}`);
       playRingtone();
+
+      incomingSession.on('ended', () => {
+        logStatus('Incoming call ended');
+        resetCallUI();
+        stopRingtone();
+      });
+
+      incomingSession.on('failed', () => {
+        logStatus('Incoming call failed');
+        resetCallUI();
+        stopRingtone();
+      });
     }
   });
-
-  ua.on('connected', () => updateStatusBar('Connected'));
-  ua.on('disconnected', () => updateStatusBar('Disconnected'));
-  ua.on('registered', () => updateStatusBar('Registered'));
-  ua.on('unregistered', () => updateStatusBar('Unregistered'));
-  ua.on('registrationFailed', () => updateStatusBar('Registration failed'));
 }
 
 function makeCall() {
@@ -42,48 +54,61 @@ function makeCall() {
   const eventHandlers = {
     progress: () => {
       console.log('call is in progress');
+      logStatus('Call is in progress');
       document.getElementById('transferControls').classList.remove('d-none');
       document.getElementById('callButton').classList.add('d-none');
       document.getElementById('closeButton').classList.remove('d-none');
       document.getElementById('holdButton').classList.remove('d-none');
-      updateStatusBar('Calling...');
     },
     failed: () => {
       console.log('call failed');
+      logStatus('Call failed');
       resetCallUI();
-      updateStatusBar('Call failed');
     },
     ended: () => {
       console.log('call ended');
+      logStatus('Call ended');
       resetCallUI();
-      updateStatusBar('Call ended');
     },
     confirmed: () => {
       console.log('call confirmed');
-      updateStatusBar('In call');
+      logStatus('Call confirmed');
+      if (isVideoCall(session)) {
+        showVideoCall();
+      }
     },
   };
 
   const options = {
     eventHandlers: eventHandlers,
-    mediaConstraints: { audio: true, video: false }
+    mediaConstraints: { audio: true, video: true } // Try video first
   };
 
   session = ua.call(uri, options);
+  session.on('peerconnection', (e) => {
+    e.peerconnection.ontrack = (event) => {
+      if (event.track.kind === 'video') {
+        showVideoCall();
+      } else {
+        hideVideoCall();
+      }
+    };
+  });
 }
 
 function hangupCall() {
   if (session) {
     session.terminate();
     resetCallUI();
-    updateStatusBar('Call ended');
+    logStatus('Call ended');
+    hideVideoCall();
   }
 }
 
 function answerCall() {
   if (incomingSession) {
     incomingSession.answer({
-      mediaConstraints: { audio: true, video: false }
+      mediaConstraints: { audio: true, video: true } // Try video first
     });
     session = incomingSession;
     incomingSession = null;
@@ -93,7 +118,28 @@ function answerCall() {
     document.getElementById('holdButton').classList.remove('d-none');
     document.getElementById('transferControls').classList.remove('d-none');
     stopRingtone();
-    updateStatusBar('In call');
+    logStatus('In call');
+    session.on('peerconnection', (e) => {
+      e.peerconnection.ontrack = (event) => {
+        if (event.track.kind === 'video') {
+          showVideoCall();
+        } else {
+          hideVideoCall();
+        }
+      };
+    });
+
+    session.on('ended', () => {
+      logStatus('Call ended');
+      resetCallUI();
+      hideVideoCall();
+    });
+
+    session.on('failed', () => {
+      logStatus('Call failed');
+      resetCallUI();
+      hideVideoCall();
+    });
   }
 }
 
@@ -103,7 +149,7 @@ function rejectCall() {
     incomingSession = null;
     resetCallUI();
     stopRingtone();
-    updateStatusBar('Call rejected');
+    logStatus('Call rejected');
   }
 }
 
@@ -113,12 +159,12 @@ function toggleHold() {
       session.hold();
       document.getElementById('holdButton').textContent = 'Unhold';
       isOnHold = true;
-      updateStatusBar('Call on hold');
+      logStatus('Call on hold');
     } else {
       session.unhold();
       document.getElementById('holdButton').textContent = 'Hold';
       isOnHold = false;
-      updateStatusBar('In call');
+      logStatus('Call resumed');
     }
   }
 }
@@ -127,7 +173,7 @@ function transferCall() {
   const transferNumber = document.getElementById('transferNumber').value;
   if (session) {
     session.refer(`sip:${transferNumber}@sipserver.com`);
-    updateStatusBar('Call transferred');
+    logStatus('Call transferred');
   }
 }
 
@@ -140,6 +186,7 @@ function saveSettings() {
   localStorage.setItem('wssServer', wssServer);
   initializeJsSIP();
   showCallDiv();
+  logStatus('Settings saved');
 }
 
 function showCallDiv() {
@@ -161,7 +208,6 @@ function showSettingsDiv() {
   document.getElementById('callDiv').classList.add('d-none');
   document.getElementById('callDiv').style.transform = 'translateX(-100%)';
   document.getElementById('saveBtn').classList.remove('d-none');
-
 }
 
 function showIncomingCall(caller) {
@@ -169,7 +215,7 @@ function showIncomingCall(caller) {
   document.getElementById('rejectButton').classList.remove('d-none');
   document.getElementById('callButton').classList.add('d-none');
   document.getElementById('closeButton').classList.add('d-none');
-  updateStatusBar(`Incoming call from ${caller}`);
+  logStatus(`Incoming call from ${caller}`);
 }
 
 function resetCallUI() {
@@ -181,11 +227,17 @@ function resetCallUI() {
   document.getElementById('holdButton').classList.add('d-none');
   document.getElementById('holdButton').textContent = 'Hold';
   session = null;
+  incomingSession = null;
   isOnHold = false;
 }
 
 function updateStatusBar(message) {
   document.getElementById('statusBar').textContent = message;
+}
+
+function logStatus(message) {
+  updateStatusBar(message);
+  console.log(message);
 }
 
 function playRingtone() {
@@ -204,6 +256,24 @@ function sendDTMF(digit) {
     session.sendDTMF(digit);
     console.log(`Sent DTMF: ${digit}`);
   }
+}
+
+function isVideoCall(session) {
+  return session.connection.getRemoteStreams().some(stream =>
+    stream.getTracks().some(track => track.kind === 'video')
+  );
+}
+
+function showVideoCall() {
+  document.getElementById('videoDiv').style.display = 'block';
+}
+
+function hideVideoCall() {
+  document.getElementById('videoDiv').style.display = 'none';
+}
+
+function endVideoCall() {
+  hangupCall();
 }
 
 document.getElementById('phoneNumber').addEventListener('input', (event) => {
@@ -243,3 +313,35 @@ document.getElementById('toggleButton').addEventListener('click', function () {
     arrowIcon.classList.add('arrow-up');
   }
 });
+
+// Get access to the user's camera and microphone
+navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+  .then(stream => {
+    const pc = new RTCPeerConnection();
+    const localVideo = document.getElementById('localVideo');
+    const remoteVideo = document.getElementById('remoteVideo');
+
+    localVideo.srcObject = stream;
+
+    stream.getTracks().forEach(track => pc.addTrack(track, stream));
+
+    pc.ontrack = event => {
+      remoteVideo.srcObject = event.streams[0];
+      if (event.track.kind === 'video') {
+        showVideoCall();
+      } else {
+        hideVideoCall();
+      }
+    };
+
+    session.connection.addEventListener('addstream', (event) => {
+      remoteVideo.srcObject = event.stream;
+    });
+
+    session.connection.addEventListener('removestream', () => {
+      remoteVideo.srcObject = null;
+    });
+  })
+  .catch(error => {
+    console.error('Error getting user media:', error);
+  });
