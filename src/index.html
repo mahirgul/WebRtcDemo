@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Softphone Application</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <section id="current-call" class="border p-3 mb-4 rounded">
+            <p id="call-status" class="p-2 bg-info text-white rounded">No active call</p>
+            <div class="form-group">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="destination" placeholder="Enter number or SIP address">                    
+                </div>                
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+            <!-- Sol taraftaki buton grubu -->
+            <div class="d-flex flex-wrap">
+                <button type="button" id="start-call-btn" class="btn btn-primary btn-sm me-2 d-none">Start Call</button>
+                <button type="button" id="register-btn" class="btn btn-success btn-sm me-2">Register</button>
+                <button type="button" id="unregister-btn" class="btn btn-warning btn-sm d-none me-2">Unregister</button>
+                <button type="button" id="answer-btn" class="btn btn-success btn-sm d-none me-2">Answer</button>
+                <button type="button" id="end-btn" class="btn btn-danger btn-sm d-none me-2">End Call</button>
+                <button type="button" id="hold-btn" class="btn btn-warning btn-sm d-none me-2">Hold</button>
+                <button type="button" id="transfer-btn" class="btn btn-info btn-sm d-none me-2">Transfer</button>
+                <button type="button" id="unlock-audio-btn" class="btn btn-warning btn-sm me-2">Enable Audio/Ringtone</button>
+            </div>
+
+            <!-- Sağ taraftaki buton grubu -->
+            <div class="d-flex">
+                <button type="button" id="toggle-logs-btn" class="btn btn-secondary btn-sm me-2">Show Logs</button>
+                <button type="button" id="toggle-settings-btn" class="btn btn-secondary btn-sm">Show Settings</button>
+            </div>
+            </div>
+
+        </section>
+        <section id="log-section" class="border p-3 mb-4 rounded d-none"> <!-- Initially hidden -->
+            <header class="bg-dark text-light p-2 rounded-top">
+                <h5 class="font-weight-bold mb-0">Logs</h5>
+            </header>
+            <textarea class="border p-3 rounded-bottom" id="status-log" rows="6" style="width:100%"></textarea>
+        </section>
+        <section id="settings" class="border p-3 rounded d-none"> <!-- Initially hidden -->
+            <header class="bg-dark text-light p-2 rounded-top">
+                <h5 class="font-weight-bold mb-0">Settings</h5>
+            </header>
+            <form id="sip-settings">
+                <div class="form-group">
+                    <label for="sip-server">SIP Server</label>
+                    <input type="text" class="form-control" id="sip-server" placeholder="Enter SIP server address">
+                </div>
+                <div class="form-group">
+                    <label for="sip-port">SIP Port</label>
+                    <input type="number" class="form-control" id="sip-port" placeholder="Enter SIP port (default: 5060)">
+                </div>
+                <div class="form-group">
+                    <label for="sip-username">SIP Username</label>
+                    <input type="text" class="form-control" id="sip-username" placeholder="Enter SIP username">
+                </div>
+                <div class="form-group">
+                    <label for="sip-password">SIP Password</label>
+                    <input type="password" class="form-control" id="sip-password" placeholder="Enter SIP password">
+                </div>
+                <div class="form-group">
+                    <label for="sip-display-name">SIP Display Name</label>
+                    <input type="text" class="form-control" id="sip-display-name" placeholder="Enter display name">
+                </div>
+                <div class="form-group">
+                    <label for="outbound-proxy">Outbound Proxy</label>
+                    <input type="text" class="form-control" id="outbound-proxy" placeholder="Enter outbound proxy (optional)">
+                </div>
+                <div class="form-group">
+                        <label for="wss-uri-input">WSS URI (Optional - overrides SIP Server/Port for WebSocket)</label>
+                        <input type="text" class="form-control" id="wss-uri-input" placeholder="e.g., wss://sbc.example.com:7443/ws">
+                    </div>
+                <div class="form-group">
+                    <label for="stun-server">STUN Server</label>
+                    <input type="text" class="form-control" id="stun-server" placeholder="Enter STUN server address">
+                </div>
+                <div class="form-group">
+                    <label for="turn-server">TURN Server</label>
+                    <input type="text" class="form-control" id="turn-server" placeholder="Enter TURN server address">
+                </div>
+                <div class="form-group">
+                    <label for="turn-username">TURN Username</label>
+                    <input type="text" class="form-control" id="turn-username" placeholder="Enter TURN username">
+                </div>
+                <div class="form-group">
+                    <label for="turn-password">TURN Password</label>
+                    <input type="password" class="form-control" id="turn-password" placeholder="Enter TURN password">
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm">Save Settings</button>
+            </form>
+        </section>
+    </div>
+
+    <!-- Audio elements for media streams -->
+    <audio id="remote-audio" autoplay controls style="display:none"></audio>
+    <audio id="local-audio" autoplay controls style="display:none"></audio>
+
+    <script src="js/jssip-3.10.0.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

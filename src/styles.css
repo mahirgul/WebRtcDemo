@@ -1,0 +1,40 @@
+body {
+    background-color: #f8f9fa;
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    margin-top: 20px;
+}
+
+.call-section, .settings-section {
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: #ffffff;
+}
+
+.call-section h2, .settings-section h2 {
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+
+.btn {
+    margin: 5px;
+}
+
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group input {
+    border-radius: 5px;
+}
+
+.footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #6c757d;
+}
