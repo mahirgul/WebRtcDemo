@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container mt-5">
+    <div class="container mt-3">
         <section id="current-call" class="border p-3 mb-4 rounded">
             <p id="call-status" class="p-2 bg-info text-white rounded">No active call</p>
             <div class="form-group">
@@ -26,24 +26,23 @@
                 <button type="button" id="end-btn" class="btn btn-danger btn-sm d-none me-2">End Call</button>
                 <button type="button" id="hold-btn" class="btn btn-warning btn-sm d-none me-2">Hold</button>
                 <button type="button" id="transfer-btn" class="btn btn-info btn-sm d-none me-2">Transfer</button>
-                <button type="button" id="unlock-audio-btn" class="btn btn-warning btn-sm me-2">Enable Audio/Ringtone</button>
+                <button type="button" id="unlock-audio-btn" class="btn btn-warning btn-sm me-2">Enable Audio</button>
+            </div>                        
             </div>
-
-            <!-- Sağ taraftaki buton grubu -->
             <div class="d-flex">
-                <button type="button" id="toggle-logs-btn" class="btn btn-secondary btn-sm me-2">Show Logs</button>
-                <button type="button" id="toggle-settings-btn" class="btn btn-secondary btn-sm">Show Settings</button>
-            </div>
+                <button type="button" id="toggle-logs-btn" class="btn btn-secondary btn-sm me-2">Logs</button>
+                <button type="button" id="toggle-settings-btn" class="btn btn-secondary btn-sm me-2">Settings</button>
+                <button type="button" id="toggle-devices-btn" class="btn btn-secondary btn-sm">Devices</button>
             </div>
 
         </section>
-        <section id="log-section" class="border p-3 mb-4 rounded d-none"> <!-- Initially hidden -->
+        <section id="logs" class="border p-3 mb-4 rounded d-none"> <!-- Initially hidden -->
             <header class="bg-dark text-light p-2 rounded-top">
                 <h5 class="font-weight-bold mb-0">Logs</h5>
             </header>
             <textarea class="border p-3 rounded-bottom" id="status-log" rows="6" style="width:100%"></textarea>
         </section>
-        <section id="settings" class="border p-3 rounded d-none"> <!-- Initially hidden -->
+        <section id="settings" class="border p-3 mb-4 rounded d-none"> <!-- Initially hidden -->
             <header class="bg-dark text-light p-2 rounded-top">
                 <h5 class="font-weight-bold mb-0">Settings</h5>
             </header>
@@ -92,14 +91,31 @@
                     <label for="turn-password">TURN Password</label>
                     <input type="password" class="form-control" id="turn-password" placeholder="Enter TURN password">
                 </div>
-                <button type="submit" class="btn btn-primary btn-sm">Save Settings</button>
+                <button type="submit" class="btn btn-primary btn-sm">Save</button>
             </form>
         </section>
+        <section id="devices" class="border p-3 mb-4 rounded d-none"> <!-- Initially hidden -->
+            <header class="bg-dark text-light p-2 rounded-top">
+                <h5 class="font-weight-bold mb-0">Audio Device Selection</h5>
+            </header>
+            <form id="device-selection-form">
+                <div class="form-group">
+                    <label for="audio-input-select">Microphone</label>
+                    <select class="form-control" id="audio-input-select"></select>
+                </div>
+                <div class="form-group">
+                    <label for="audio-output-select">Speaker</label>
+                    <select class="form-control" id="audio-output-select"></select>
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm">Save Devices</button>
+            </form>
+        </section>        
+       
     </div>
 
     <!-- Audio elements for media streams -->
-    <audio id="remote-audio" autoplay controls style="display:none"></audio>
-    <audio id="local-audio" autoplay controls style="display:none"></audio>
+    <audio id="remote-audio" autoplay controls style="display: none;"></audio>
+    <audio id="local-audio" autoplay muted controls style="display: none;"></audio>
 
     <script src="js/jssip-3.10.0.js"></script>
     <script src="js/app.js"></script>
