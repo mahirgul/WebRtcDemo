@@ -245,7 +245,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (remoteAudio && typeof remoteAudio.setSinkId === 'function') {
             remoteAudio.setSinkId(deviceId)
                 .then(() => logStatus(`Audio output device set to: ${deviceId || 'System Default'}`))
-                .catch(e => logStatus(`Error setting audio output: ${e.message}`));
+                .catch(e => logStatus(`Error setting audio output device ${deviceId || 'System Default'}: ${e.message}`));
         }
     }
 
@@ -1027,9 +1027,9 @@ document.addEventListener('DOMContentLoaded', function() {
         toggleLogsButton.addEventListener('click', () => {
             logSection.classList.toggle('d-none');
             if (logSection.classList.contains('d-none')) {
-                toggleLogsButton.textContent = 'Show Logs';
+                toggleLogsButton.style.backgroundColor = '#6c757d';             
             } else {
-                toggleLogsButton.textContent = 'Hide Logs';
+                toggleLogsButton.style.backgroundColor = 'red';                
             }
         });
     }
@@ -1039,9 +1039,9 @@ document.addEventListener('DOMContentLoaded', function() {
         toggleSettingsButton.addEventListener('click', () => {
             settingsSection.classList.toggle('d-none');
             if (settingsSection.classList.contains('d-none')) {
-                toggleSettingsButton.textContent = 'Show Settings';
+                toggleSettingsButton.style.backgroundColor = '#6c757d';
             } else {
-                toggleSettingsButton.textContent = 'Hide Settings';
+                toggleSettingsButton.style.backgroundColor = 'red';
             }
         });
     }
@@ -1050,9 +1050,9 @@ document.addEventListener('DOMContentLoaded', function() {
         toggleDevicesButton.addEventListener('click', () => {
             devicesSection.classList.toggle('d-none');
             if (devicesSection.classList.contains('d-none')) {
-                toggleDevicesButton.textContent = 'Show Devices';
+                toggleDevicesButton.style.backgroundColor = '#6c757d';
             } else {
-                toggleDevicesButton.textContent = 'Hide Devices';
+                toggleDevicesButton.style.backgroundColor = 'red';
             }
         });
     }
@@ -1062,7 +1062,7 @@ document.addEventListener('DOMContentLoaded', function() {
         audioInputSelect.addEventListener('change', function() {
             settings.selectedAudioInputId = this.value;
             localStorage.setItem('softphoneSettings', JSON.stringify(settings)); // Save selection
-            logStatus(`Audio input device selected: ${this.options[this.selectedIndex].text}`);
+            logStatus(`Audio input device saved: ${this.options[this.selectedIndex].text}`);
             // Note: Input device change typically applies on the next call or renegotiation.
         });
     }
@@ -1072,7 +1072,7 @@ document.addEventListener('DOMContentLoaded', function() {
         audioOutputSelect.addEventListener('change', function() {
             settings.selectedAudioOutputId = this.value;
             localStorage.setItem('softphoneSettings', JSON.stringify(settings)); // Save selection
-            logStatus(`Audio output device selected: ${this.options[this.selectedIndex].text}`);
+            logStatus(`Audio output device saved: ${this.options[this.selectedIndex].text}`);
             applyAudioOutputDevice(this.value);
         });
     }
@@ -1081,6 +1081,7 @@ document.addEventListener('DOMContentLoaded', function() {
     loadSettings();
     populateAudioDevices(); // Populate devices after loading settings
     updateButtonVisibility();
+    applyAudioOutputDevice(settings.selectedAudioOutputId); // Apply saved output device on load
 
     // Attempt to auto-register SIP on page load if settings are present and valid
     const canRegisterAfterLoad = settings.sipUsername && settings.sipServer && (settings.wssUri || settings.sipServer);
