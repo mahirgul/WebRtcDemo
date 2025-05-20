@@ -38,3 +38,43 @@ body {
     font-size: 14px;
     color: #6c757d;
 }
+
+/* DTMF Keypad Styles */
+.keypad-container {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    max-width: 200px;
+    margin: 10px auto;
+}
+
+.keypad-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 5px;
+}
+
+.dtmf-btn {
+    width: 60px;
+    height: 40px;
+    font-size: 1.2em;
+    margin: 2px;
+}
+
+.dtmf-btn:active,
+.dtmf-btn.active {
+    background-color: #007bff;
+    color: white;
+}
+
+#dtmf-keypad {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+}
+
+/* Hide DTMF keypad by default */
+#dtmf-keypad.d-none {
+    display: none !important;
+}

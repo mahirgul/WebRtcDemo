@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // UI Sections
     const logSection = document.getElementById('logs');
     const settingsSection = document.getElementById('settings');
+    const dtmfKeypad = document.getElementById('dtmf-keypad'); // DTMF tuş takımı
     const devicesSection = document.getElementById('devices');
 
     // Call Destination Input
@@ -313,6 +314,20 @@ document.addEventListener('DOMContentLoaded', function() {
         endCallButton.classList.toggle('d-none', !callActive);
         endCallButton.disabled = !callActive;
     }
+
+    /**
+     * Updates the visibility of the DTMF keypad based on the current call state.
+     */
+    function updateDtmfKeypadVisibility() {
+        if (!dtmfKeypad) return; // DTMF keypad element not found
+
+        const callActiveAndEstablished = currentSession && currentSession.isEstablished && currentSession.isEstablished();
+
+        dtmfKeypad.classList.toggle('d-none', !callActiveAndEstablished);
+        logStatus(`DTMF Keypad visibility updated: ${callActiveAndEstablished ? 'Visible' : 'Hidden'}`);
+    }
+
+
     /**
      * Sets up event handlers for a JsSIP.UA instance.
      * @param {JsSIP.UA} jssipUa - The JsSIP User Agent instance.
@@ -407,6 +422,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 ringtone.currentTime = 0;
             }
             updateButtonVisibility();
+            updateDtmfKeypadVisibility(); // DTMF görünürlüğünü de güncelle
 
             // Session event handlers
             currentSession.on('ended', (e) => {
@@ -419,6 +435,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 ringtone.pause();
                 holdCallButton.textContent = 'Hold';
                 ringtone.currentTime = 0;
+                updateDtmfKeypadVisibility(); // DTMF gizle
                 updateButtonVisibility();
             });
 
@@ -437,6 +454,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 ringtone.pause();
                 holdCallButton.textContent = 'Hold';
                 ringtone.currentTime = 0;
+                updateDtmfKeypadVisibility(); // DTMF gizle
                 updateButtonVisibility();
             });
 
@@ -456,6 +474,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Ensure ringtone stops when call is accepted
                 ringtone.pause();
                 ringtone.currentTime = 0;
+                updateDtmfKeypadVisibility(); // DTMF göster
                 updateButtonVisibility();
             });
 
@@ -467,7 +486,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Ensure ringtone stops when call is confirmed
                 ringtone.pause();
                 ringtone.currentTime = 0;
-                updateButtonVisibility();                
+                updateDtmfKeypadVisibility(); // DTMF göster
+                updateButtonVisibility();
             });
 
             // Listen for hold/unhold events
@@ -498,6 +518,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 ringtone.pause();
                 ringtone.currentTime = 0;
                 holdCallButton.textContent = 'Hold';
+                updateDtmfKeypadVisibility(); // DTMF gizle
                 updateButtonVisibility();
             });
 
@@ -506,7 +527,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log(`SDP (${data.originator} ${data.type}):\n${data.sdp}`);
             });
 
-            // PeerConnection event handler'ı direkt olarak RTCSession'a bağlanıyor
+            // PeerConnection event handler'ı
             console.log('Setting up peerconnection handler for session:', currentSession);
             if (currentSession.connection) {
                 logStatus('Session already has a connection, setting up handlers...');
@@ -590,6 +611,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         logStatus('Connection lost or failed');
                         document.getElementById('call-status').textContent = `Call connection ${pc.connectionState}`;
                     }
+                    updateDtmfKeypadVisibility(); // Bağlantı durumuna göre DTMF'i güncelle
                 };
             });
         });
@@ -677,6 +699,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         ringtone.pause();
                         ringtone.currentTime = 0;
                         holdCallButton.textContent = 'Hold';
+                        updateDtmfKeypadVisibility(); // Bağlantı durumuna göre DTMF'i güncelle
                         updateButtonVisibility();
                     }
                 };
@@ -1081,6 +1104,7 @@ document.addEventListener('DOMContentLoaded', function() {
     loadSettings();
     populateAudioDevices(); // Populate devices after loading settings
     updateButtonVisibility();
+    updateDtmfKeypadVisibility(); // Initial DTMF keypad visibility
     applyAudioOutputDevice(settings.selectedAudioOutputId); // Apply saved output device on load
 
     // Attempt to auto-register SIP on page load if settings are present and valid
@@ -1109,4 +1133,37 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // Add event listeners for DTMF keypad buttons
+    if (dtmfKeypad) {
+        const dtmfButtons = dtmfKeypad.querySelectorAll('button[data-digit]');
+        dtmfButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const digit = this.getAttribute('data-digit');
+                if (currentSession && currentSession.isEstablished && currentSession.isEstablished()) {
+                    logStatus(`Sending DTMF: ${digit}`);
+                    currentSession.sendDTMF(digit);
+                } else {
+                    logStatus('Cannot send DTMF: No active call.');
+                }
+            });
+        });
+    }
+
+    // Add keyboard support for DTMF
+    const validDtmfKeys = ['0','1','2','3','4','5','6','7','8','9','*','#'];
+    document.addEventListener('keydown', function(event) {
+        if (!currentSession || !currentSession.isEstablished || !currentSession.isEstablished()) return;
+        const key = event.key;
+        if (validDtmfKeys.includes(key)) {
+            logStatus(`Sending DTMF: ${key}`);
+            currentSession.sendDTMF(key);
+            // Visual feedback on the keypad
+            const button = dtmfKeypad.querySelector(`button[data-digit="${key}"]`);
+            if (button) {
+                button.classList.add('active');
+                setTimeout(() => button.classList.remove('active'), 120);
+            }
+        }
+    });
 });
