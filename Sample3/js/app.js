@@ -6,14 +6,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const holdCallButton = document.getElementById('hold-btn'); // Button to hold/unhold the current call
     const transferCallButton = document.getElementById('transfer-btn'); // Button to transfer the current call
     const answerCallButton = document.getElementById('answer-btn'); // Button to answer an incoming call
+    const transferCompleteButton = document.getElementById('transferCompleteButton'); // Button to finalize the transfer
     const unregisterButton = document.getElementById('unregister-btn'); // Button to unregister from SIP server
     const registerButton = document.getElementById('register-btn'); // Button to register to SIP server
     const terminateCallButton = document.getElementById('terminate-btn'); // Button to terminate the current call (alternative to endCallButton)
     const unlockAudioButton = document.getElementById('unlock-audio-btn'); // Button to manually unlock audio context
     const toggleLogsButton = document.getElementById('toggle-logs-btn'); // Button to toggle logs visibility
+    const toggleKeypadButton = document.getElementById('toggle-keypad-btn'); // Button to toggle DTMF keypad visibility
     const toggleSettingsButton = document.getElementById('toggle-settings-btn'); // Button to toggle settings visibility
     const toggleDevicesButton = document.getElementById('toggle-devices-btn'); // Button to toggle audio devices section visibility
-    const saveSettingsButton = document.querySelector('#sip-settings button[type="submit"]'); // Button to save SIP settings
+    const saveSettingsButton = document.querySelector('#sip-settings button[type="submit"]'); // Button to save SIP settings (assuming it's a submit type within sip-settings form)
 
     // SIP Setting Inputs
     const sipServerInput = document.getElementById('sip-server'); // Input for SIP server address
@@ -28,13 +30,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const stunServerInput = document.getElementById('stun-server'); // Input for STUN server
     const turnServerInput = document.getElementById('turn-server'); // Input for TURN server
     const turnUsernameInput = document.getElementById('turn-username'); // Input for TURN username
+    const autoShowKeypadCheckbox = document.getElementById('auto-show-keypad-checkbox'); // Checkbox for auto-show DTMF keypad
     const turnPasswordInput = document.getElementById('turn-password'); // Input for TURN password
 
     // UI Sections
     const logSection = document.getElementById('logs');
     const settingsSection = document.getElementById('settings');
-    const dtmfKeypad = document.getElementById('dtmf-keypad'); // DTMF tuş takımı
+    const dtmfKeypad = document.getElementById('dtmf-keypad'); // DTMF keypad
     const devicesSection = document.getElementById('devices');
+    const transferFieldsContainer = document.getElementById('transferFieldsContainer'); // Container for transfer destination and complete button (blind transfer)
 
     // Call Destination Input
     const destinationInput = document.getElementById('destination'); // Input for call destination (number or SIP URI)
@@ -42,6 +46,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Device selection elements
     const audioInputSelect = document.getElementById('audio-input-select');
     const audioOutputSelect = document.getElementById('audio-output-select');
+
+    // Transfer Destination Input
+    const transferDestinationInput = document.getElementById('transfer-destination'); // Input for transfer destination
 
     // Ringtone Audio element
     const ringtone = new Audio('sounds/bell.mp3');
@@ -93,6 +100,7 @@ document.addEventListener('DOMContentLoaded', function() {
             unlockAudioButton.textContent = 'Audio Enabled';
             unlockAudioButton.disabled = true;
             unlockAudioButton.classList.replace('btn-warning', 'btn-success');
+            unlockAudioButton.classList.add('d-none');
         }
         logStatus('Audio context unlocked successfully.');
     }
@@ -117,6 +125,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 turnServerInput.value = settings.turnServer || '';
                 turnUsernameInput.value = settings.turnUsername || '';
                 turnPasswordInput.value = settings.turnPassword || '';
+                // Ensure autoShowKeypad is a boolean, defaulting to false if not present or not explicitly true
+                settings.autoShowKeypad = settings.autoShowKeypad === true;
+                if (autoShowKeypadCheckbox) {
+                    autoShowKeypadCheckbox.checked = settings.autoShowKeypad;
+                }
                 settings.selectedAudioInputId = settings.selectedAudioInputId || ''; // Load saved input device
                 settings.selectedAudioOutputId = settings.selectedAudioOutputId || ''; // Load saved output device
                 logStatus('Settings loaded from localStorage.');
@@ -125,6 +138,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 logStatus('Error: Failed to parse settings from localStorage.');
             }
         } else {
+            // No saved settings, initialize defaults for settings object
+            settings = {
+                autoShowKeypad: false // Default for a new user or cleared storage
+            };
             logStatus('No saved settings found in localStorage.');
         }
     }
@@ -182,6 +199,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         logStatus(`ICE Servers configured: ${iceServers.length > 0 ? JSON.stringify(iceServers) : 'None (for local call or no STUN/TURN configured)'}`);
         return iceServers;
+    }
+
+    /**
+     * Hides the transfer destination input and complete button.
+     */
+    function hideTransferFields() {
+        if (transferFieldsContainer) {
+            transferFieldsContainer.style.display = 'none';
+        }
     }
 
     /**
@@ -299,7 +325,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
         // Call Action Buttons (End, Hold, Transfer)
         const callEstablished = currentSession && currentSession.isEstablished && currentSession.isEstablished();
-    
+
         endCallButton.classList.toggle('d-none', !callEstablished);
         endCallButton.disabled = !callEstablished;
     
@@ -313,6 +339,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const callActive = currentSession && (!currentSession.status || currentSession.status !== STATUS_TERMINATED);
         endCallButton.classList.toggle('d-none', !callActive);
         endCallButton.disabled = !callActive;
+
     }
 
     /**
@@ -321,10 +348,18 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateDtmfKeypadVisibility() {
         if (!dtmfKeypad) return; // DTMF keypad element not found
 
+        // If auto-show is not enabled (i.e., not explicitly true),
+        // do not proceed with automatic visibility changes. 
+        // Manual toggle will still work independently.
+        if (settings.autoShowKeypad !== true) {
+            // logStatus('Auto-show DTMF keypad is disabled.'); // Optional: for debugging
+            return;
+        }
+
         const callActiveAndEstablished = currentSession && currentSession.isEstablished && currentSession.isEstablished();
 
         dtmfKeypad.classList.toggle('d-none', !callActiveAndEstablished);
-        logStatus(`DTMF Keypad visibility updated: ${callActiveAndEstablished ? 'Visible' : 'Hidden'}`);
+        logStatus(`DTMF Keypad visibility updated (auto): ${callActiveAndEstablished ? 'Visible' : 'Hidden'}`);
     }
 
 
@@ -359,6 +394,9 @@ document.addEventListener('DOMContentLoaded', function() {
             if (currentSession && currentSession.direction === 'incoming' && !currentSession.isEstablished() && !ringtone.paused) {
                 ringtone.pause();
                 ringtone.currentTime = 0;
+            }
+            if (currentSession) { // If a call was active during UA disconnect
+                hideTransferFields(); // Hide transfer fields if a session was active
             }
             updateButtonVisibility();
         });
@@ -402,10 +440,10 @@ document.addEventListener('DOMContentLoaded', function() {
             currentSession = data.session;
             const remoteIdentity = currentSession.remote_identity.uri.toString();
 
-            // Set Hold button text to default
+            // Set Hold button to default
             holdCallButton.textContent = 'Hold';
 
-            // Incoming call: show status and play ringtone
+            // Incoming call: show status and play ringtone if audio context is unlocked
             if (currentSession.direction === 'incoming') {
                 const statusMsg = `Incoming call from ${remoteIdentity}`;
                 document.getElementById('call-status').textContent = statusMsg;
@@ -422,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 ringtone.currentTime = 0;
             }
             updateButtonVisibility();
-            updateDtmfKeypadVisibility(); // DTMF görünürlüğünü de güncelle
+            updateDtmfKeypadVisibility(); // Also update DTMF visibility
 
             // Session event handlers
             currentSession.on('ended', (e) => {
@@ -435,7 +473,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 ringtone.pause();
                 holdCallButton.textContent = 'Hold';
                 ringtone.currentTime = 0;
-                updateDtmfKeypadVisibility(); // DTMF gizle
+                updateDtmfKeypadVisibility(); // Hide DTMF
+                hideTransferFields(); // Hide transfer fields on call end
                 updateButtonVisibility();
             });
 
@@ -454,7 +493,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 ringtone.pause();
                 holdCallButton.textContent = 'Hold';
                 ringtone.currentTime = 0;
-                updateDtmfKeypadVisibility(); // DTMF gizle
+                updateDtmfKeypadVisibility(); // Hide DTMF
+                hideTransferFields(); // Hide transfer fields on call fail
                 updateButtonVisibility();
             });
 
@@ -474,7 +514,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Ensure ringtone stops when call is accepted
                 ringtone.pause();
                 ringtone.currentTime = 0;
-                updateDtmfKeypadVisibility(); // DTMF göster
+                updateDtmfKeypadVisibility(); // Show DTMF
                 updateButtonVisibility();
             });
 
@@ -486,7 +526,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Ensure ringtone stops when call is confirmed
                 ringtone.pause();
                 ringtone.currentTime = 0;
-                updateDtmfKeypadVisibility(); // DTMF göster
+                updateDtmfKeypadVisibility(); // Show DTMF
                 updateButtonVisibility();
             });
 
@@ -518,7 +558,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 ringtone.pause();
                 ringtone.currentTime = 0;
                 holdCallButton.textContent = 'Hold';
-                updateDtmfKeypadVisibility(); // DTMF gizle
+                updateDtmfKeypadVisibility(); // Hide DTMF
+                hideTransferFields(); // Hide transfer fields on bye
                 updateButtonVisibility();
             });
 
@@ -527,7 +568,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log(`SDP (${data.originator} ${data.type}):\n${data.sdp}`);
             });
 
-            // PeerConnection event handler'ı
+            // PeerConnection event handler
             console.log('Setting up peerconnection handler for session:', currentSession);
             if (currentSession.connection) {
                 logStatus('Session already has a connection, setting up handlers...');
@@ -547,7 +588,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const pc = e.peerconnection;
                 logStatus(`PeerConnection state: ${pc.connectionState || 'unknown'}`);
                 
-                // Audio track handler'ı
+                // Audio track handler
                 pc.ontrack = (event) => {
                     console.log('Remote track event received:', event);
                     if (event.track.kind === 'audio') {
@@ -610,8 +651,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (['disconnected', 'failed', 'closed'].includes(pc.connectionState)) {
                         logStatus('Connection lost or failed');
                         document.getElementById('call-status').textContent = `Call connection ${pc.connectionState}`;
+                        hideTransferFields(); // Hide transfer fields on connection loss
+                        updateButtonVisibility();
                     }
-                    updateDtmfKeypadVisibility(); // Bağlantı durumuna göre DTMF'i güncelle
+                    updateDtmfKeypadVisibility(); // Update DTMF based on connection state (this was already translated in a previous step, ensuring it's correct)
                 };
             });
         });
@@ -621,7 +664,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('UA Event: newMessage fired', data);
             const message = `New message from ${data.originator.uri.user}: ${data.request.body}`;
             logStatus(`SIP Message: ${message}`);
-            alert(message);
+            //alert(message);
         });
     }
 
@@ -698,8 +741,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         document.getElementById('call-status').textContent = `Call connection ${pc.connectionState}.`;
                         ringtone.pause();
                         ringtone.currentTime = 0;
+                        hideTransferFields(); // Hide transfer fields on connection loss
                         holdCallButton.textContent = 'Hold';
-                        updateDtmfKeypadVisibility(); // Bağlantı durumuna göre DTMF'i güncelle
+                         if (currentSession) { // Check if a session exists in any state (this comment was already English)
+                            logStatus('After transfer call disconnected. Terminating current session...');
+                            currentSession.terminate();
+                         }
+                        updateDtmfKeypadVisibility(); // Update DTMF based on connection state
                         updateButtonVisibility();
                     }
                 };
@@ -735,14 +783,14 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             document.getElementById('call-status').textContent = 'WSS URI or SIP Server required for WebSocket.';
             logStatus('Config Error: WSS URI or SIP Server required for WebSocket.');
-            alert('Configuration error: WSS URI or SIP Server must be set.');
+            //alert('Configuration error: WSS URI or SIP Server must be set.');
             return;
         }
 
         if (!currentSettings.sipUsername || !currentSettings.sipServer) {
             document.getElementById('call-status').textContent = 'SIP Username and Server are required.';
             logStatus('Config Error: SIP Username and Server are required.');
-            alert('Configuration error: SIP Username and Server must be set.');
+            //alert('Configuration error: SIP Username and Server must be set.');
             updateButtonVisibility();
             return;
         }
@@ -773,7 +821,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error initializing JsSIP UA:', error);
             document.getElementById('call-status').textContent = `Error: ${error.message}`;
             logStatus(`Error initializing JsSIP UA: ${error.message}`);
-            alert(`Failed to initialize SIP client: ${error.message}`);
+            //alert(`Failed to initialize SIP client: ${error.message}`);
             updateButtonVisibility();
         }
     }
@@ -782,22 +830,25 @@ document.addEventListener('DOMContentLoaded', function() {
     // Save settings and re-initialize SIP if valid
     saveSettingsButton.addEventListener('click', function(e) {
         e.preventDefault();
-        settings = {
-            sipServer: sipServerInput.value.trim(),
-            sipPort: sipPortInput.value.trim(),
-            sipUsername: sipUsernameInput.value.trim(),
-            sipPassword: sipPasswordInput.value, // Passwords should not be trimmed
-            sipDisplayName: sipDisplayNameInput.value.trim(),
-            outboundProxy: outboundProxyInput.value.trim(),
-            stunServer: stunServerInput.value.trim(),
-            turnServer: turnServerInput.value.trim(),
-            turnUsername: turnUsernameInput.value.trim(),
-            turnPassword: turnPasswordInput.value, // Passwords should not be trimmed
-            wssUri: wssUriInput.value.trim()
-        };
+        // Update properties of the existing global 'settings' object
+        settings.sipServer = sipServerInput.value.trim();
+        settings.sipPort = sipPortInput.value.trim();
+        settings.sipUsername = sipUsernameInput.value.trim();
+        settings.sipPassword = sipPasswordInput.value; // Passwords should not be trimmed
+        settings.sipDisplayName = sipDisplayNameInput.value.trim();
+        settings.outboundProxy = outboundProxyInput.value.trim();
+        settings.stunServer = stunServerInput.value.trim();
+        settings.turnServer = turnServerInput.value.trim();
+        settings.turnUsername = turnUsernameInput.value.trim();
+        settings.turnPassword = turnPasswordInput.value; // Passwords should not be trimmed
+        settings.wssUri = wssUriInput.value.trim();
+        if (autoShowKeypadCheckbox) {
+            settings.autoShowKeypad = autoShowKeypadCheckbox.checked;
+        }
+
         localStorage.setItem('softphoneSettings', JSON.stringify(settings));
         logStatus('Settings saved to localStorage.');
-        alert('Settings saved!');
+        //alert('Settings saved!');
 
         // Re-initialize and register SIP with new settings
         if (settings.sipUsername && (settings.wssUri || settings.sipServer)) {
@@ -812,12 +863,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 ua = null;
             }
         }
+        updateButtonVisibility();
+
+        settingsSection.classList.toggle('d-none');
+        if (settingsSection.classList.contains('d-none')) {
+            toggleSettingsButton.style.backgroundColor = '#6c757d';
+        } else {
+            toggleSettingsButton.style.backgroundColor = 'red';
+        }
     });
 
     // Start outgoing call
     startCallButton.addEventListener('click', function() {
         if (!ua || !ua.isRegistered()) {
-            alert('SIP client is not registered. Please check settings or wait for registration.');
+            //alert('SIP client is not registered. Please check settings or wait for registration.');
             logStatus('Start Call: SIP client not registered.');
             return;
         }
@@ -860,7 +919,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             } catch (err) {
                 logStatus(`Error initiating call: ${err.message}`);
-                alert('Call could not be started: ' + err.message);
+                //alert('Call could not be started: ' + err.message);
                 document.getElementById('call-status').textContent = 'Call start error.';
                 currentSession = null; // Ensure session is cleared on immediate call error
             }
@@ -890,7 +949,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     failed_callback: (e) => {
                         console.error('Hold failed', e);
                         logStatus(`Hold failed: ${e ? e.cause : 'Unknown reason'}`);
-                        alert('Failed to put call on hold.');
+                        //alert('Failed to put call on hold.');
                     }
                 }); // No options needed for basic hold
             } else {
@@ -898,7 +957,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 currentSession.unhold({ failed_callback: (e) => {
                     console.error('Unhold failed', e);
                     logStatus(`Unhold failed: ${e ? e.cause : 'Unknown reason'}`);
-                    alert('Failed to resume call.'); } });
+                    //alert('Failed to resume call.');
+                    } });
             }
         } else {
              logStatus('Hold/Unhold: No active call to hold/unhold.');
@@ -909,38 +969,64 @@ document.addEventListener('DOMContentLoaded', function() {
     // Transfer call to another SIP URI
     transferCallButton.addEventListener('click', function() {
         if (currentSession && currentSession.isEstablished()) {
-            const target = prompt('Enter the SIP URI to transfer to (e.g., sip:1002@domain.com or 1002):');
-            if (target) {
-                const transferTarget = target.includes('@') ? target : `sip:${target}@${settings.sipServer}`;
-                currentSession.refer(transferTarget, {
-                    eventHandlers: { // These are for the REFER request itself
-                        'requestSucceeded': function(e) {
-                            logStatus(`Transfer to ${transferTarget} request succeeded.`);
-                            document.getElementById('call-status').textContent = 'Transfer initiated...';
-                        },
-                        'requestFailed': function(e) {
-                            logStatus(`Transfer to ${transferTarget} request failed: ${e.cause}`);
-                            document.getElementById('call-status').textContent = 'Transfer failed.';
-                            alert('Call transfer failed.');
-                        },
-                        'accepted': function(e) {
-                            logStatus(`Transfer to ${transferTarget} accepted by server.`);
-                            document.getElementById('call-status').textContent = 'Transfer accepted by server.';
-                        },
-                        'failed': function(e) {
-                             logStatus(`Transfer to ${transferTarget} ultimately failed: ${e.cause}`);
-                             document.getElementById('call-status').textContent = `Transfer failed: ${e.cause}`;
-                             alert(`Call transfer failed: ${e.cause}`);
-                        }
-                    }});
-                logStatus(`Attempting to transfer call to ${transferTarget}.`);
+            // Show the transfer destination input and complete button
+            if (transferFieldsContainer && transferDestinationInput) {
+                transferFieldsContainer.style.display = 'flex'; // Use flex to keep input and button side-by-side
+                transferDestinationInput.focus(); // Focus the input field
+                logStatus('Transfer button clicked. Showing transfer fields.');
+            } else {
+                logStatus('Error: Transfer UI elements not found.');
             }
         } else {
             logStatus('Transfer: No active call to transfer.');
             document.getElementById('call-status').textContent = 'No active call to transfer.';
+            hideTransferFields(); // Ensure fields are hidden if button was somehow clicked without active call
         }
     });
 
+    // Complete Transfer button action
+    if (transferCompleteButton && transferDestinationInput) {
+        transferCompleteButton.addEventListener('click', function() {
+            if (!currentSession || !currentSession.isEstablished()) {
+                logStatus('Complete Transfer: No active call to transfer.');
+                document.getElementById('call-status').textContent = 'No active call to transfer.';
+                hideTransferFields(); // Hide fields if no active call
+                return;
+            }
+
+            const target = transferDestinationInput.value.trim();
+            if (target) {
+                const transferTarget = target.includes('@') ? target : `sip:${target}@${settings.sipServer}`;
+                logStatus(`Attempting to transfer call to ${transferTarget}.`);
+                currentSession.refer(transferTarget, {
+                    eventHandlers: { // These are for the REFER request itself
+                        'requestSucceeded': (e) => {
+                            logStatus(`Transfer to ${transferTarget} request succeeded.`);
+                            document.getElementById('call-status').textContent = 'Transfer initiated...';
+                            // The call will typically end on the transferring side after a successful REFER.
+                        },
+                        'requestFailed': (e) => {
+                            logStatus(`Transfer to ${transferTarget} request failed: ${e.cause}`);
+                            document.getElementById('call-status').textContent = 'Transfer failed.';
+                            //alert(`Call transfer failed: ${e.cause}`);
+                            // Do not hide fields here, user might want to try again or correct the number.
+                        }
+                    }
+                });
+                // Hide fields immediately after initiating the REFER.
+                hideTransferFields();
+                transferDestinationInput.value = ''; // Clear the input
+                if (currentSession) { // Check if a session exists in any state
+                    logStatus('After transfer call disconnected. Terminating current session...');
+                    currentSession.terminate();
+                }
+            } else {
+                logStatus('Transfer: No destination entered for transfer.');
+                //alert('Please enter a transfer destination.');
+                // Do not hide fields, user needs to enter a destination.
+            }
+        });
+    }
     // Answer incoming call
     answerCallButton.addEventListener('click', function() {
         if (currentSession && currentSession.direction === 'incoming' && !currentSession.isEstablished()) {
@@ -971,6 +1057,7 @@ document.addEventListener('DOMContentLoaded', function() {
             currentSession = null;
             ringtone.pause();
             ringtone.currentTime = 0;
+            hideTransferFields(); // Hide transfer fields as session is terminated and nulled
         }
         if (ua && (ua.isRegistered() || ua.isConnecting())) {
             logStatus('Unregister button: Unregistering from SIP server.');
@@ -991,14 +1078,14 @@ document.addEventListener('DOMContentLoaded', function() {
     registerButton.addEventListener('click', function() {
         if (settings.sipUsername && (settings.wssUri || settings.sipServer)) {
             if (ua && ua.isRegistered()) {
-                alert('Already registered.');
+                //alert('Already registered.');
                 logStatus('Register button: Already registered.');
                 return;
             }
             initializeAndRegisterSip(settings);
             logStatus('Register button: Attempting to initialize and register SIP.');
         } else {
-            alert('SIP settings incomplete. Please configure and save settings first.');
+            //alert('SIP settings incomplete. Please configure and save settings first.');
             logStatus('Register button: SIP settings incomplete.');
         }
         updateButtonVisibility();
@@ -1022,7 +1109,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initial Setup and Checks
     // Check if JsSIP library is loaded
     if (typeof JsSIP === 'undefined' || typeof JsSIP.UA === 'undefined') {
-        alert('JsSIP library could not be loaded! Please check your js/jssip-3.10.0.js path.');
+        //alert('JsSIP library could not be loaded! Please check your js/jssip-3.10.0.js path.');
         document.getElementById('call-status').textContent = 'JsSIP library not loaded.';
         logStatus('FATAL: JsSIP library not loaded.');
         return;
@@ -1042,6 +1129,18 @@ document.addEventListener('DOMContentLoaded', function() {
     if (unlockAudioButton) {
         unlockAudioButton.addEventListener('click', () => {
             attemptUnlockAudioContext(); // Call the function directly
+        });
+    }
+
+    // Event listener for toggling DTMF keypad visibility
+    if (toggleKeypadButton && dtmfKeypad) {
+        toggleKeypadButton.addEventListener('click', () => {
+            dtmfKeypad.classList.toggle('d-none');
+            if (dtmfKeypad.classList.contains('d-none')) {
+                toggleKeypadButton.style.backgroundColor = '#6c757d';             
+            } else {
+                toggleKeypadButton.style.backgroundColor = 'red';                
+            }
         });
     }
 
@@ -1104,6 +1203,7 @@ document.addEventListener('DOMContentLoaded', function() {
     loadSettings();
     populateAudioDevices(); // Populate devices after loading settings
     updateButtonVisibility();
+    hideTransferFields(); // Ensure transfer fields are hidden on initial load
     updateDtmfKeypadVisibility(); // Initial DTMF keypad visibility
     applyAudioOutputDevice(settings.selectedAudioOutputId); // Apply saved output device on load
 
@@ -1153,6 +1253,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add keyboard support for DTMF
     const validDtmfKeys = ['0','1','2','3','4','5','6','7','8','9','*','#'];
     document.addEventListener('keydown', function(event) {
+        if (!dtmfKeypad) return;
+        if (dtmfKeypad.classList.contains('d-none')) return; // Ignore if keypad is hidden
+        if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') return; // Ignore if typing in input/textarea
         if (!currentSession || !currentSession.isEstablished || !currentSession.isEstablished()) return;
         const key = event.key;
         if (validDtmfKeys.includes(key)) {
@@ -1166,4 +1269,5 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
+
 });
