@@ -1,7 +1,7 @@
 WebRTC web phone sample
 
 Sample3:
-![image](https://github.com/user-attachments/assets/f7f9d5a9-bbc3-433f-b594-14edce0bcffe)
+![image](https://github.com/user-attachments/assets/2bb35abd-8c56-4c9e-a40a-2c3dd96a1f3e)
 
 
 
