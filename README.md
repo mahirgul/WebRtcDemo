@@ -6,11 +6,11 @@ Sample3: This sample created from to zero with jsSIP
 
 
 
-Sample2: Based From Audiocodes:
+Sample2: Based From Audiocodes demo samples:
 
 ![image](https://i.imgur.com/s6tFsci.gif)
 
-Sample1: Based From Audiocodes:
+Sample1: Based From Audiocodes demo samples:
 
 [You can try with this link.](https://mhrgl.com/phone/)
 
